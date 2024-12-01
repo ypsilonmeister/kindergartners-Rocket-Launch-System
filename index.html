@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>おしたくタイムライン</title>
+    <style>
+        .styled {
+            border: 1 gray solid;
+            line-height: 2.5;
+            padding: 0 40px;
+            font-size: 1rem;
+            text-align: center;
+            border-radius: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+        google.charts.load("current", { packages: ["timeline", 'table'] })
+        google.charts.setOnLoadCallback(drawChart)
+        let dataTable;
+        let dataTable2
+        let options = {
+            animation: {
+                startup: true,
+                duration: 1000
+            },
+            alternatingRowStyle: false,
+            avoidOverlappingGridLines: false,
+            timeline: {
+                rowLabelStyle: { fontSize: 24 },
+                barLabelStyle: { fontSize: 24 },
+                howRowLabels: false
+            }
+        }
+        let chart;
+        let table;
+        let position = 0;
+        let voices = window.speechSynthesis.getVoices();
+        let timeid;
+
+        function speech(text) {
+            let msg = new SpeechSynthesisUtterance(text);
+            msg.pitch = 1; // From 0 to 2
+            msg.lang = 'ja';
+            speechSynthesis.speak(msg);
+        }
+
+        function drawChart() {
+            let container = document.getElementById("timeline")
+            chart = new google.visualization.Timeline(container)
+            dataTable = new google.visualization.DataTable()
+            dataTable.addColumn({ type: "string", id: "Role" })
+            dataTable.addColumn({ type: "string", id: "Name" })
+            dataTable.addColumn({ type: "datetime", id: "Start" })
+            dataTable.addColumn({ type: "datetime", id: "End" })
+
+            dataTable2 = new google.visualization.DataTable()
+            dataTable2.addColumn('string', "名前");
+            dataTable2.addColumn('number', "秒");
+
+
+            let nowDate = new Date()
+            dataTable.addRows([
+                [
+                    "あさ",
+                    "ごはん",
+                    new Date(nowDate.getTime() + 1 * (60 * 1000)),
+                    new Date(nowDate.getTime() + 1 * (60 * 1000))
+                ],
+                [
+                    "あさ",
+                    "はみがき",
+                    new Date(nowDate.getTime() + 1 * (60 * 1000)),
+                    new Date(nowDate.getTime() + 1 * (60 * 1000) + 1)
+                ],
+                [
+                    "あさ",
+                    "おきがえ",
+                    new Date(nowDate.getTime() + 1 * (60 * 1000)),
+                    new Date(nowDate.getTime() + 1 * (60 * 1000) + 1)
+                ],
+                [
+                    "あさ",
+                    "もちもの",
+                    new Date(nowDate.getTime() + 1 * (60 * 1000)),
+                    new Date(nowDate.getTime() + 1 * (60 * 1000) + 1)
+                ],
+            ])
+
+            chart.draw(dataTable, options)
+
+            table = new google.visualization.Table(document.getElementById('table_div'));
+            table.draw(dataTable2, { showRowNumber: true, width: '100%', height: '100%' });
+
+            document.getElementById("current").innerHTML = dataTable.getValue(0, 1);
+
+        }
+
+        function nextChart() {
+            console.log(dataTable.getNumberOfRows(), position);
+
+            let nowDate = new Date();
+            const org = dataTable.getValue(position, 2)
+
+            dataTable.setValue(position, 3, new Date(nowDate.getTime() + 1 * (60 * 1000) - 10));
+            const sec = Math.round((dataTable.getValue(position, 3) - org) / 1000)
+            dataTable2.addRow([dataTable.getValue(position, 1), { v: sec, f: `${sec}秒` }]);
+            position += 1;
+            if (dataTable.getNumberOfRows() === position) {
+                clearInterval(timeid);
+                speech('全てのシーケンスが終了しました。バスが来るまで自由時間を開始してください');
+                document.getElementById('nextButton').disabled = true;
+                table.draw(dataTable2, { showRowNumber: true, width: '100%', height: '100%' });
+                return;
+            }
+            const nextAction = dataTable.getValue(position, 1)
+            document.getElementById("current").innerHTML = nextAction
+
+            speech(`次のシーケンス、"${nextAction}" に移行します`);
+        }
+
+
+
+        function start() {
+            timeid = setInterval(() => {
+                if (!dataTable) {
+                    return;
+                }
+                let nowDate = new Date();
+
+
+                for (i = 0; i < 4; i++) {
+                    if (position >= i) {
+                        continue;
+                    }
+                    dataTable.setValue(i, 2, new Date(nowDate.getTime() + 1 * (60 * 1000)));
+
+                }
+                for (i = 0; i < 4; i++) {
+                    if (position > i) {
+                        continue;
+                    }
+                    dataTable.setValue(i, 3, new Date(nowDate.getTime() + 1 * (60 * 1000) + 1));
+
+                }
+                chart.draw(dataTable, options);
+                table.draw(dataTable2, { width: '100%', height: '100%' });
+
+
+            }, 1);
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('nextButton').disabled = false;
+            const nextAction = dataTable.getValue(0, 1)
+
+            speech(`とうえんじゅんびを開始します。最初のシーケンス、${nextAction} を開始してください。`);
+        }
+    </script>
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="timeline" style="height: 40%;"></div>
+    <div id="table_div" style="height: 40%;"></div>
+    <button onclick="start();" id="startButton" class="styled">
+        シーケンススタート
+    </button>
+    <button onclick="nextChart();" id="nextButton" class="styled" disabled>
+        <span id='current'></span> Completed
+    </button>
+</body>
+
+</html>
