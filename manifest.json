@@ -1,5 +1,8 @@
 {
     "name": "おしたく打ち上げシステム",
+    "short_name": "おしたく",
+    "display": "standalone",
+    "start_url": "index.html",
     "icons": [
       {
         "src": "icons/512.png",
