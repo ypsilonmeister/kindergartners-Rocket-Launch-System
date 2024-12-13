@@ -43,6 +43,15 @@
         let timeid;
         let countup = 0;
 
+        let defaultSequence = [
+            { ja: 'ごはん', en: 'breakfast' },
+            { ja: 'はみがき', en: 'dental brushing' },
+            { ja: 'おきがえ', en: 'change of clothes' },
+            { ja: 'もちもの', en: 'Preparation of belongings' }
+        ];
+
+        let sequences = defaultSequence;
+
         function appendVoices() {
             voicesJa = speechSynthesis.getVoices().filter(voice => voice.lang.match('ja'));
             voicesEn = speechSynthesis.getVoices().filter(voice => voice.lang.match('en'));
@@ -85,32 +94,10 @@
 
 
             let nowDate = new Date()
-            dataTable.addRows([
-                [
-                    "あさ",
-                    "ごはん",
-                    new Date(nowDate.getTime()),
-                    new Date(nowDate.getTime() + 1)
-                ],
-                [
-                    "あさ",
-                    "はみがき",
-                    new Date(nowDate.getTime()),
-                    new Date(nowDate.getTime() + 1)
-                ],
-                [
-                    "あさ",
-                    "おきがえ",
-                    new Date(nowDate.getTime()),
-                    new Date(nowDate.getTime() + 1)
-                ],
-                [
-                    "あさ",
-                    "もちもの",
-                    new Date(nowDate.getTime()),
-                    new Date(nowDate.getTime() + 1)
-                ],
-            ])
+            dataTable.addRows(sequences.map(s => {
+                return ["あさ", s.ja, new Date(nowDate.getTime()),
+                    new Date(nowDate.getTime() + 1)];
+            }));
 
             chart.draw(dataTable, options)
 
@@ -122,6 +109,10 @@
         }
 
         function nextChart() {
+            document.getElementById('nextButton').disabled = true;
+            setTimeout(() => {
+                document.getElementById('nextButton').disabled = false;
+            }, 1000)
             countup = 0;
             let nowDate = new Date();
             const org = dataTable.getValue(position, 2)
@@ -139,7 +130,7 @@
             }
             const nextAction = dataTable.getValue(position, 1)
             document.getElementById("current").innerHTML = nextAction
-            speech(`次のシーケンスは、"${nextAction}" です。すみやかに移行してください。`, `The next sequence is “${nextAction}”. Please execute the transition as soon as possible.`);
+            speech(`次のシーケンスは、「${nextAction}」 です。すみやかに移行してください。`, `The next sequence is “${sequences.find(s => s.ja === nextAction).en}”. Please execute the transition as soon as possible.`);
         }
 
 
@@ -148,34 +139,35 @@
             document.getElementById('startButton').disabled = true;
             document.getElementById('nextButton').disabled = false;
             const nextAction = dataTable.getValue(0, 1);
-            speech(`とうえんじゅんびを開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for kindergarten attendance. Start the first sequence, ${nextAction}.`);
+            speech(`とうえんじゅんびを開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for kindergarten attendance. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
 
             let nowDate = new Date();
 
             dataTable.setValue(0, 2, new Date(nowDate.getTime()));
-            timeid = setInterval(() => {
-                if (!dataTable) {
-                    return;
-                }
-                let nowDate = new Date();
-                for (i = position + 1; i < dataTable.getNumberOfRows(); i++) {
-                    dataTable.setValue(i, 2, new Date(nowDate.getTime()));
-                }
-                for (i = position; i < dataTable.getNumberOfRows(); i++) {
-                    dataTable.setValue(i, 3, new Date(nowDate.getTime() + 1));
-                }
-                chart.draw(dataTable, options);
-                const start = dataTable.getValue(position, 2);
-                const diff = nowDate - start;
+            timeid = setInterval(updateChart,10);
+        }
 
-                const min = Math.floor(diff / 1000 / 60);
-                if (countup !== min) {
-                    countup = min;
-                    speech(`${countup} 分、経過しました。`, `${countup} minute${countup === 1 ? '' : 's'} elapsed.`);
-                }
-            }, 1);
+        function updateChart() {
+            if (!dataTable) {
+                return;
+            }
+            let nowDate = new Date();
+            for (i = position + 1; i < dataTable.getNumberOfRows(); i++) {
+                dataTable.setValue(i, 2, new Date(nowDate.getTime()));
+            }
+            for (i = position; i < dataTable.getNumberOfRows(); i++) {
+                dataTable.setValue(i, 3, new Date(nowDate.getTime() + 1));
+            }
+            chart.draw(dataTable, options);
+            const start = dataTable.getValue(position, 2);
+            const diff = nowDate - start;
 
+            const min = Math.floor(diff / 1000 / 60);
+            if (countup !== min) {
+                countup = min;
+                speech(`${countup} 分、経過しました。`, `${countup} minute${countup === 1 ? '' : 's'} elapsed.`);
 
+            }
         }
     </script>
     <style>
