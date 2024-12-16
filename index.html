@@ -102,9 +102,7 @@
 
         function nextChart() {
             document.getElementById('nextButton').disabled = true;
-            setTimeout(() => {
-                document.getElementById('nextButton').disabled = false;
-            }, 1000)
+
             countUp = 0;
             let nowDate = new Date();
             const org = dataTable.getValue(position, 2)
@@ -118,9 +116,11 @@
                 speech('全てのシーケンスが終了しました。バスが来るまで自由時間を開始してください', 'All sequences have been completed. Please start your free time until the bus arrives.');
                 document.getElementById('nextButton').disabled = true;
                 pie.draw(dataTable2, pieOption);
-                document.getElementById('nextButton').disabled = true;
                 return;
             }
+            setTimeout(() => {
+                document.getElementById('nextButton').disabled = false;
+            }, 1000)            
             const nextAction = dataTable.getValue(position, 1)
             document.getElementById("current").innerHTML = nextAction
             speech(`次のシーケンスは、「${nextAction}」 です。すみやかに移行してください。`, `The next sequence is “${sequences.find(s => s.ja === nextAction).en}”. Please execute the transition as soon as possible.`);
@@ -194,8 +194,8 @@
             border-radius: 5px;
         }
         #buttons {
-            margin-bottom: 3rem;
-            margin-left: 3rem;
+            margin-bottom: 1rem;
+            margin-left: 1rem;
         }
     </style>
 </head>
