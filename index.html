@@ -33,7 +33,7 @@
         let voicesEn;
         let timeId;
         let countUp = 0;
-        const pieOption = { pieSliceText: 'value', pieHole: 0.4 };
+        const pieOption = { pieSliceText: 'value', pieHole: 0.4, height:'100%', width:'100%'};
 
         let defaultSequence = [
             { ja: 'ごはん', en: 'breakfast' },
@@ -86,9 +86,9 @@
 
 
             let nowDate = new Date()
-            dataTable.addRows(sequences.map(s => {
-                return ["あさ", s.ja, new Date(nowDate.getTime()),
-                    new Date(nowDate.getTime() + 1)];
+            dataTable.addRows(sequences.map((s,i) => {
+                return ["あさ", s.ja, new Date(nowDate.getTime() + i),
+                    new Date(nowDate.getTime() + i + 1)];
             }));
 
             chart.draw(dataTable, options)
@@ -175,12 +175,13 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            margin: 0;
         }
 
         article {
             min-height: 100%;
             display: grid;
-            grid-template-rows: 1fr 1fr auto;
+            grid-template-rows: 2fr 3fr auto;
             grid-template-columns: 100%;
             
         }
