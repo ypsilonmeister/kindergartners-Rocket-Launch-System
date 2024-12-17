@@ -34,6 +34,7 @@
         let timeId;
         let countUp = 0;
         const pieOption = { pieSliceText: 'value', pieHole: 0.4, height:'100%', width:'100%'};
+        let pie;
 
         let defaultSequence = [
             { ja: 'ごはん', en: 'breakfast' },
@@ -51,7 +52,7 @@
 
         appendVoices()
 
-        speechSynthesis.onvoiceschanged = e => {
+        speechSynthesis.onvoiceschanged = _e => {
             appendVoices()
         }
         function speech(text, eng) {
@@ -145,7 +146,7 @@
                 return;
             }
             let nowDate = new Date();
-            for (i = position + 1; i < dataTable.getNumberOfRows(); i++) {
+            for (const i = position + 1; i < dataTable.getNumberOfRows(); i++) {
                 dataTable.setValue(i, 2, new Date(nowDate.getTime()));
             }
             for (i = position; i < dataTable.getNumberOfRows(); i++) {
@@ -164,7 +165,7 @@
 
             const name = dataTable.getValue(position, 1);
             const split = name.split(':');
-            dataTable.setValue(position, 1, `${split[0]}:${diff}`)
+            dataTable.setValue(position, 1, `${split[0]}:${(diff/1000).toFixed(3)}`)
             chart.draw(dataTable, options);
 
         }
