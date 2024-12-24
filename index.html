@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="manifest" href="manifest.json" />
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://kit.fontawesome.com/54ccae21a7.js" crossorigin="anonymous"></script>
     <title>おしたくタイムライン</title>
 
     <script type="text/javascript">
@@ -33,8 +34,9 @@
         let voicesEn;
         let timeId;
         let countUp = 0;
-        const pieOption = { pieSliceText: 'value', pieHole: 0.4, height:'100%', width:'100%'};
+        const pieOption = { pieSliceText: 'value', pieHole: 0.4, height: '100%', width: '100%' };
         let pie;
+
 
         let defaultSequence = [
             { ja: 'ごはん', en: 'breakfast' },
@@ -87,7 +89,7 @@
 
 
             let nowDate = new Date()
-            dataTable.addRows(sequences.map((s,i) => {
+            dataTable.addRows(sequences.map((s, i) => {
                 return ["あさ", s.ja, new Date(nowDate.getTime() + i),
                     new Date(nowDate.getTime() + i + 1)];
             }));
@@ -121,7 +123,7 @@
             }
             setTimeout(() => {
                 document.getElementById('nextButton').disabled = false;
-            }, 1000)            
+            }, 1000)
             const nextAction = dataTable.getValue(position, 1)
             document.getElementById("current").innerHTML = nextAction
             speech(`次のシーケンスは、「${nextAction}」 です。すみやかに移行してください。`, `The next sequence is “${sequences.find(s => s.ja === nextAction).en}”. Please execute the transition as soon as possible.`);
@@ -165,9 +167,18 @@
 
             const name = dataTable.getValue(position, 1);
             const split = name.split(':');
-            dataTable.setValue(position, 1, `${split[0]}:${(diff/1000).toFixed(3)}`)
+            dataTable.setValue(position, 1, `${split[0]}:${(diff / 1000).toFixed(3)}`)
             chart.draw(dataTable, options);
+        }
 
+        function openSettings() {
+            const dialog = document.querySelector("dialog");
+            dialog.showModal();
+        }
+
+        function closeSettings() {
+            const dialog = document.querySelector("dialog");
+            dialog.close();           
         }
     </script>
     <style>
@@ -184,7 +195,7 @@
             display: grid;
             grid-template-rows: 2fr 3fr auto;
             grid-template-columns: 100%;
-            
+
         }
 
         .styled {
@@ -195,9 +206,19 @@
             text-align: center;
             border-radius: 5px;
         }
+
         #buttons {
             margin-bottom: 1rem;
             margin-left: 1rem;
+        }
+
+        #settingButton {
+            float: right;
+        }
+
+        dialog {
+            height: 100%;
+            width: 100%;
         }
     </style>
 </head>
@@ -213,8 +234,23 @@
             <button onclick="nextChart();" id="nextButton" class="styled" disabled>
                 <span id='current'></span> Completed
             </button>
+            <button onclick="openSettings();"  class="styled" id="settingButton">
+                <i class="fa-solid fa-gear">a</i>
+            </button>
         </div>
     </article>
+
+    <dialog>
+        <section>
+            <header>設定画面</header>
+            <div>
+                content
+            </div>
+            <footer>
+                <button onclick="closeSettings();" class="styled">Close</button>
+            </footer>
+          </section>
+    </dialog>
 </body>
 
 </html>
