@@ -14,7 +14,7 @@
         google.charts.setOnLoadCallback(drawChart)
         let dataTable;
         let dataTable2
-        let options = {
+        const timelineOptions = {
             animation: {
                 startup: true,
                 duration: 1000
@@ -37,15 +37,36 @@
         const pieOption = { pieSliceText: 'value', pieHole: 0.4, height: '100%', width: '100%' };
         let pie;
 
-
-        let defaultSequence = [
+        let holiday;
+        const defaultSequence = [
             { ja: 'ごはん', en: 'breakfast' },
             { ja: 'はみがき', en: 'dental brushing' },
             { ja: 'おきがえ', en: 'change of clothes' },
             { ja: 'もちもの', en: 'Preparation of belongings' }
         ];
+        let sequences = [...defaultSequence];
 
-        let sequences = defaultSequence;
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem("settings"))
+            holiday = settings?.holiday;
+            if (settings) {
+                for (const setting in settings) {
+                    if (document.querySelector(`#${setting}`).getAttribute('type') === 'checkbox') {
+                        document.querySelector(`#${setting}`).setAttribute('checked', settings[setting]);
+                    }
+                }
+            }
+
+            if (holiday) {
+                sequences.splice(-1)
+            }
+            else {
+                sequences = [...defaultSequence];
+            }
+            drawChart();
+        }
+
+
 
         function appendVoices() {
             voicesJa = speechSynthesis.getVoices().filter(voice => voice.lang.match('ja'));
@@ -94,7 +115,7 @@
                     new Date(nowDate.getTime() + i + 1)];
             }));
 
-            chart.draw(dataTable, options)
+            chart.draw(dataTable, timelineOptions)
 
             pie = new google.visualization.PieChart(document.getElementById('piechart'));
             pie.draw(dataTable2, pieOption);
@@ -116,7 +137,12 @@
             position += 1;
             if (dataTable.getNumberOfRows() === position) {
                 clearInterval(timeId);
-                speech('全てのシーケンスが終了しました。バスが来るまで自由時間を開始してください', 'All sequences have been completed. Please start your free time until the bus arrives.');
+                if (holiday) {
+                    speech('全てのシーケンスが終了しました。お休みを楽しんでください。', 'All sequences have been completed. Enjoy your holiday!');
+                }
+                else {
+                    speech('全てのシーケンスが終了しました。バスが来るまで自由時間を開始してください', 'All sequences have been completed. Please start your free time until the bus arrives.');
+                }
                 document.getElementById('nextButton').disabled = true;
                 pie.draw(dataTable2, pieOption);
                 return;
@@ -134,8 +160,14 @@
         function start() {
             document.getElementById('startButton').disabled = true;
             document.getElementById('nextButton').disabled = false;
+            document.getElementById('settingButton').disabled = true;
             const nextAction = dataTable.getValue(0, 1);
-            speech(`とうえんじゅんびを開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for kindergarten attendance. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+            if (holiday) {
+                speech(`休みの朝のおしたくを開始しましょう！。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for the morning of the vacation!. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+            }
+            else {
+                speech(`とうえんじゅんびを開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for kindergarten attendance. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+            }
 
             let nowDate = new Date();
 
@@ -168,7 +200,7 @@
             const name = dataTable.getValue(position, 1);
             const split = name.split(':');
             dataTable.setValue(position, 1, `${split[0]}:${(diff / 1000).toFixed(3)}`)
-            chart.draw(dataTable, options);
+            chart.draw(dataTable, timelineOptions);
         }
 
         function openSettings() {
@@ -178,7 +210,22 @@
 
         function closeSettings() {
             const dialog = document.querySelector("dialog");
-            dialog.close();           
+            dialog.close();
+        }
+
+        function saveSettings() {
+            const inputs = document.querySelectorAll('#settingContent input');
+            let settings = {};
+            inputs.forEach(a => {
+                const setting = a.getAttribute('id')
+                if (a.getAttribute('type') === 'checkbox') {
+                    settings[setting] = a.checked;
+                }
+            });
+            window.localStorage.setItem('settings', JSON.stringify(settings));
+            loadSettings();
+            const dialog = document.querySelector("dialog");
+            dialog.close();
         }
     </script>
     <style>
@@ -207,6 +254,12 @@
             border-radius: 5px;
         }
 
+        .save {
+            background-color: #0176d3;
+            color: #fff;
+            border-color: #0176d3;
+        }
+
         #buttons {
             margin-bottom: 1rem;
             margin-left: 1rem;
@@ -219,6 +272,61 @@
         dialog {
             height: 100%;
             width: 100%;
+        }
+
+        section {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            grid-template-columns: 100%;
+            min-height: 100%;
+        }
+
+
+        .modal-close {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            padding: 0;
+            background: none;
+            background-color: transparent;
+            background-clip: border-box;
+            border: 1px solid transparent;
+            border-radius: .25rem;
+            line-height: 1.875rem;
+            text-decoration: none;
+            white-space: normal;
+            user-select: none;
+            align-self: flex-start;
+            font-size: 40px;
+        }
+
+        section>header {
+            display: grid;
+            grid-template-rows: 100%;
+            grid-template-columns: 1fr auto;
+        }
+
+        .center {
+
+            display: flex;
+            justify-content: center;
+            -ms-flex-line-pack: center;
+            align-content: center;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            margin: auto;
+        }
+
+        #settingContent {
+
+            padding: 30px 30%;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #settingContent>* {
+            width: 50%;
         }
     </style>
 </head>
@@ -234,7 +342,7 @@
             <button onclick="nextChart();" id="nextButton" class="styled" disabled>
                 <span id='current'></span> Completed
             </button>
-            <button onclick="openSettings();"  class="styled" id="settingButton">
+            <button onclick="openSettings();" class="styled" id="settingButton">
                 <i class="fa-solid fa-gear">a</i>
             </button>
         </div>
@@ -242,14 +350,24 @@
 
     <dialog>
         <section>
-            <header>設定画面</header>
-            <div>
-                content
+            <header>
+                <span class="center">Settings</span><button id="close" class="modal-close">&times;</button>
+            </header>
+            <div id="settingContent">
+                <form>
+                    <input type="checkbox" name="holiday" id="holiday" />
+                    <label for="holiday">
+                        <span>幼稚園休み</span>
+                    </label>
+                </form>
             </div>
             <footer>
-                <button onclick="closeSettings();" class="styled">Close</button>
+                <div class=center>
+                    <button onclick="closeSettings();" class="styled">Close</button>
+                    <button onclick="saveSettings();" class="styled save">Save</button>
+                </div>
             </footer>
-          </section>
+        </section>
     </dialog>
 </body>
 
