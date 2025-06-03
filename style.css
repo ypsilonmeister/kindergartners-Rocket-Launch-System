@@ -9,7 +9,7 @@ body {
 article {
   min-height: 100%;
   display: grid;
-  grid-template-rows: 1fr 2fr 3fr auto;
+  grid-template-rows: 1fr 1.5fr 3fr auto;
   grid-template-columns: 100%;
 }
 
@@ -139,4 +139,33 @@ section > header {
     background: #0176d3;
     border-radius: 1px;
     transition: left 0.2s;
+}
+
+#compareArea table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: #fafcff;
+}
+
+#compareArea th, #compareArea td {
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 1em;
+}
+
+#compareArea th {
+    background: #e6f0fa;
+    font-weight: bold;
+}
+
+#compareArea tr:nth-child(2) td {
+    background: #e0ffe0; /* 今回 */
+}
+#compareArea tr:nth-child(3) td {
+    background: #fffbe0; /* 前回 */
+}
+#compareArea tr:nth-child(4) td {
+    background: #f0f0f0; /* 平均 */
 }

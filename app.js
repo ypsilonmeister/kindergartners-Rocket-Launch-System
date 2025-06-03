@@ -152,6 +152,12 @@ function nextChart() {
         clearInterval(timeId2);
         timeid = undefined;
         timeId2 = undefined;
+        const currentTimes = [];
+        for (let i = 0; i < dataTable2.getNumberOfRows(); i++) {
+            currentTimes.push(dataTable2.getValue(i, 1));
+        }
+        saveHistory(currentTimes);
+        showCompare(currentTimes);        
         if (holiday) {
             speech('全てのシーケンスが終了しました。お休みを楽しんでください。', 'All sequences have been completed. Enjoy your holiday!');
         }
@@ -226,6 +232,7 @@ function start() {
 
     timeId2 = setInterval(updateTimelineInfo, 1000);
     updateTimelineInfo();
+    document.getElementById('compareArea').innerHTML = '';
 }
 
 function updateChart() {
@@ -293,4 +300,64 @@ function saveSettings() {
     loadSettings();
     const dialog = document.querySelector("dialog");
     dialog.close();
+}
+
+function saveHistory(currentTimes) {
+    let history = JSON.parse(localStorage.getItem('sequenceHistory') || '[]');
+    history.push(currentTimes);
+    // 履歴は直近20件だけ保存
+    if (history.length > 20) history = history.slice(-20);
+    localStorage.setItem('sequenceHistory', JSON.stringify(history));
+}
+
+function getHistory() {
+    return JSON.parse(localStorage.getItem('sequenceHistory') || '[]');
+}
+
+function calcAverage(history) {
+    if (history.length === 0) return [];
+    const len = history[0].length;
+    const avg = Array(len).fill(0);
+    history.forEach(times => {
+        for (let i = 0; i < len; i++) {
+            avg[i] += times[i];
+        }
+    });
+    return avg.map(t => Math.round(t / history.length));
+}
+
+function showCompare(currentTimes) {
+    const history = getHistory();
+    const prev = history.length > 1 ? history[history.length - 2] : null;
+    const avg = calcAverage(history.slice(0, history.length - 1)); // 今回を除く平均
+
+
+    // --- Google BarChart 表示 ---
+    // データテーブル作成
+    let barData = new google.visualization.DataTable();
+    barData.addColumn('string', 'シーケンス');
+    barData.addColumn('number', '今回');
+    if (prev) barData.addColumn('number', '前回');
+    if (avg.length) barData.addColumn('number', '平均');
+
+    for (let i = 0; i < sequences.length; i++) {
+        let row = [sequences[i].ja, currentTimes[i] || 0];
+        if (prev) row.push(prev[i] || 0);
+        if (avg.length) row.push(avg[i] || 0);
+        barData.addRow(row);
+    }
+
+    let barOptions = {
+        width: '100%',
+        height: '100%',
+        legend: { position: 'top' },
+        hAxis: { title: '秒', minValue: 0 },
+        vAxis: { title: 'シーケンス' },
+        chartArea: { left: 80, width: '70%', height: '70%' },
+        colors: ['#0176d3', '#ffb300', '#888'],
+        isStacked: false
+    };
+
+    let barChart = new google.visualization.BarChart(document.getElementById('barchart'));
+    barChart.draw(barData, barOptions);
 }
