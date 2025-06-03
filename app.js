@@ -21,6 +21,7 @@ let position = 0;
 let voicesJa;
 let voicesEn;
 let timeId;
+let timeId2;
 let countUp = 0;
 const pieOption = { pieSliceText: 'value', pieHole: 0.4, height: '100%', width: '100%' };
 let pie;
@@ -34,9 +35,32 @@ const defaultSequence = [
 ];
 let sequences = [...defaultSequence];
 
+let startTime = new Date(); // シーケンス開始時刻
+let goalTime = new Date(startTime);
+goalTime.setHours(8, 0, 0, 0);
+
+function updateTimelineInfo() {
+    // 時刻表示
+    document.getElementById('startTime').textContent = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('goalTime').textContent = goalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    // インジケーター位置計算
+    const now = new Date();
+    const total = goalTime - startTime;
+    const elapsed = now - startTime;
+    let percent = Math.max(0, Math.min(1, elapsed / total));
+    document.getElementById('time-indicator').style.left = (percent * 100) + '%';
+
+}
+
+
+
 function loadSettings() {
     const settings = JSON.parse(localStorage.getItem("settings"))
     holiday = settings?.holiday;
+    if (settings?.goalTime) {
+        goalTime = new Date(settings.goalTime);
+    }
     if (settings) {
         for (const setting in settings) {
             if (document.querySelector(`#${setting}`).getAttribute('type') === 'checkbox') {
@@ -44,7 +68,6 @@ function loadSettings() {
             }
         }
     }
-
     if (holiday) {
         sequences.splice(-1)
     }
@@ -126,7 +149,9 @@ function nextChart() {
     position += 1;
     if (dataTable.getNumberOfRows() === position) {
         clearInterval(timeId);
+        clearInterval(timeId2);
         timeid = undefined;
+        timeId2 = undefined;
         if (holiday) {
             speech('全てのシーケンスが終了しました。お休みを楽しんでください。', 'All sequences have been completed. Enjoy your holiday!');
         }
@@ -175,6 +200,7 @@ function prevChart() {
     }
     if (!timeId) {
         timeId = setInterval(updateChart, 10);
+        timeId2 = setInterval(updateTimelineInfo, 1000);
     }
 }
 
@@ -194,15 +220,18 @@ function start() {
     }
 
     let nowDate = new Date();
-
+    startTime = new Date(); 
     dataTable.setValue(0, 2, new Date(nowDate.getTime()));
     timeId = setInterval(updateChart, 10);
+
+    timeId2 = setInterval(updateTimelineInfo, 1000);
+    updateTimelineInfo();
 }
 
 function updateChart() {
     if (!dataTable) {
         return;
-    } 
+    }
     let nowDate = new Date();
     for (let i = position + 1; i < dataTable.getNumberOfRows(); i++) {
         dataTable.setValue(i, 2, new Date(nowDate.getTime()));
@@ -229,6 +258,13 @@ function updateChart() {
 
 function openSettings() {
     const dialog = document.querySelector("dialog");
+    const goalTimeInput = document.getElementById('goalTimeInput');
+    if (goalTimeInput && goalTime) {
+        // goalTimeをinput[type="time"]の値に変換
+        const hh = String(goalTime.getHours()).padStart(2, '0');
+        const mm = String(goalTime.getMinutes()).padStart(2, '0');
+        goalTimeInput.value = `${hh}:${mm}`;
+    }
     dialog.showModal();
 }
 
@@ -246,7 +282,14 @@ function saveSettings() {
             settings[setting] = a.checked;
         }
     });
-    window.localStorage.setItem('settings', JSON.stringify(settings));
+    const goalTimeInput = document.getElementById('goalTimeInput');
+    if (goalTimeInput && goalTimeInput.value) {
+        const [hh, mm] = goalTimeInput.value.split(':');
+        const newGoal = new Date(goalTime);
+        newGoal.setHours(Number(hh), Number(mm), 0, 0);
+        goalTime = newGoal;
+    }
+    settings.goalTime = goalTime.toISOString(); window.localStorage.setItem('settings', JSON.stringify(settings));
     loadSettings();
     const dialog = document.querySelector("dialog");
     dialog.close();
