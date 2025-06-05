@@ -30,7 +30,9 @@
         <div id="timeline-info">
             <span id="startTime"></span>
             <div id="time-bar">
-                <div id="time-indicator"></div>
+                <div id="time-indicator">
+                    <span id="currentTime"></span>
+                </div>
             </div>
             <span id="goalTime"></span>
 
@@ -44,22 +46,18 @@
             <div id="barchart" style="height:50%"></div>
 
         </div>
-        <!-- Navigation controls  -->
-        <div class="nav-controls">
-            <!-- Button to go back one unit. This button is disabled by default. It becomes enabled when the current sequence starts.  -->
-            <button onclick="prevChart();" id="prevButton" class="styled disabled">前に戻る</button>
-            <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
+        <div>
 
-            <!-- Button to advance one unit. The current sequence starts here and stops when the timeline reaches the end of this sequence. If the sequence is not started, then this button becomes enabled once the current sequence starts.  -->
-            <button onclick="nextChart();" id="nextButton" class="styled disabled"><span id='current'></span>
-                Completed</button>
-        </div>
-
-        <!-- Action controls  -->
-        <div class="action-controls">
-            <!-- Button to open the settings dialog (unchanged).  -->
-            <button onclick="openSettings();" id="settingButton" class="styled save setting-button"><i
-                    class="fa-solid fa-gear"></i></button>
+            <div class="nav-controls">
+                <button onclick="prevChart();" id="prevButton" class="styled " disabled>前に戻る</button>
+                <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
+                <button onclick="nextChart();" id="nextButton" class="styled" disabled><span id='current'></span>
+                    Completed</button>
+            </div>
+            <div class="action-controls">
+                <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
+                        class="fa-solid fa-gear">setting</i></button>
+            </div>            
         </div>
     </article>
 

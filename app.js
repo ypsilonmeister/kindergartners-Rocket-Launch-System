@@ -44,13 +44,15 @@ function updateTimelineInfo() {
     document.getElementById('startTime').textContent = startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     document.getElementById('goalTime').textContent = goalTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // インジケーター位置計算
+    // 現在時刻表示
     const now = new Date();
+    document.getElementById('currentTime').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // インジケーター位置計算
     const total = goalTime - startTime;
     const elapsed = now - startTime;
     let percent = Math.max(0, Math.min(1, elapsed / total));
     document.getElementById('time-indicator').style.left = (percent * 100) + '%';
-
 }
 
 
@@ -59,7 +61,9 @@ function loadSettings() {
     const settings = JSON.parse(localStorage.getItem("settings"))
     holiday = settings?.holiday;
     if (settings?.goalTime) {
-        goalTime = new Date(settings.goalTime);
+        goalTime =  new Date(startTime);
+        const [hh, mm] = settings.goalTime.split(':');
+        goalTime.setHours(Number(hh), Number(mm), 0, 0);        
     }
     if (settings) {
         for (const setting in settings) {
@@ -291,12 +295,9 @@ function saveSettings() {
     });
     const goalTimeInput = document.getElementById('goalTimeInput');
     if (goalTimeInput && goalTimeInput.value) {
-        const [hh, mm] = goalTimeInput.value.split(':');
-        const newGoal = new Date(goalTime);
-        newGoal.setHours(Number(hh), Number(mm), 0, 0);
-        goalTime = newGoal;
+        settings.goalTime = goalTimeInput.value
     }
-    settings.goalTime = goalTime.toISOString(); window.localStorage.setItem('settings', JSON.stringify(settings));
+    window.localStorage.setItem('settings', JSON.stringify(settings));
     loadSettings();
     const dialog = document.querySelector("dialog");
     dialog.close();
