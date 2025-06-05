@@ -146,9 +146,9 @@ function drawChart() {
 
     // timeline-infoの表示/非表示もここで念のため制御
     if (modeDraw === 'morning') {
-        document.getElementById('timeline-info').style.display = '';
+        document.getElementById('timeline-info').style.visibility = 'visible';
     } else {
-        document.getElementById('timeline-info').style.display = 'none';
+        document.getElementById('timeline-info').style.visibility = 'hidden';
     }
     // ボタン類は常に表示
     document.querySelector('.nav-controls').style.display = '';
@@ -401,13 +401,13 @@ function changeSequenceMode() {
         timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.label = 'あさ';
-        document.getElementById('timeline-info').style.display = '';
+        document.getElementById('timeline-info').style.visibility = 'visible';
     } else {
         sequences = [...afterSequence];
         timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.label = '帰宅';
-        document.getElementById('timeline-info').style.display = 'none';
+        document.getElementById('timeline-info').style.visibility = 'hidden';
     }
     position = 0;
     drawChart();

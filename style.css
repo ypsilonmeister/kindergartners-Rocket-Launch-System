@@ -8,11 +8,13 @@ body {
 
 article {
   min-height: 100%;
-  display: grid;
-  grid-template-rows: minmax(60px, 120px) 1.5fr 3fr auto;
-  grid-template-columns: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
+#contents {
+  flex: 1;
+}
 
 #buttons {
   margin-bottom: 1rem;
@@ -89,7 +91,7 @@ section>header {
   margin: 24px 0 0 0;
   gap: 16px;
   position: static;
-  /* 固定表示しない場合は static、画面下中央固定なら position: fixed; left: 50%; transform: translateX(-50%); bottom: 32px; */
+  flex-wrap: wrap;
 }
 
 .action-controls {

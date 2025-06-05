@@ -26,35 +26,36 @@
 <body>
     <!-- Main content  -->
     <article>
-        <!-- Timeline element (unchanged)-->
-        <div id="timeline-info">
-            <span id="startTime"></span>
-            <div id="time-bar">
-                <div id="time-indicator">
-                    <span id="currentTime"></span>
+        <div id="contents">
+            <!-- Timeline element (unchanged)-->
+            <div id="timeline-info" style="height: 100px;">
+                <span id="startTime"></span>
+                <div id="time-bar">
+                    <div id="time-indicator">
+                        <span id="currentTime"></span>
+                    </div>
                 </div>
+                <span id="goalTime"></span>
+
             </div>
-            <span id="goalTime"></span>
+            <div id="timeline"></div>
 
+            <!--Pie chart  -->
+            <div>
+                <div id="piechart" style="height:50%"></div>
+
+                <div id="barchart" style="height:50%"></div>
+
+            </div>
         </div>
-        <div id="timeline"></div>
-
-        <!--Pie chart  -->
-        <div>
-            <div id="piechart" style="height:50%"></div>
-
-            <div id="barchart" style="height:50%"></div>
-
-        </div>
-        <div style="margin-bottom: 12px; text-align: center;">
-            <label for="sequenceMode" style="font-weight:bold;">モード：</label>
-            <select id="sequenceMode" onchange="changeSequenceMode()">
-                <option value="morning">あさ</option>
-                <option value="after">おかえり</option>
-            </select>
-        </div>
-        <div>
-
+        <footer>
+            <div style="margin-bottom: 12px; text-align: center;">
+                <label for="sequenceMode" style="font-weight:bold;">モード：</label>
+                <select id="sequenceMode" onchange="changeSequenceMode()">
+                    <option value="morning">あさ</option>
+                    <option value="after">おかえり</option>
+                </select>
+            </div>
             <div class="nav-controls">
                 <button onclick="prevChart();" id="prevButton" class="styled " disabled>前に戻る</button>
                 <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
@@ -65,7 +66,7 @@
                 <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
                         class="fa-solid fa-gear">setting</i></button>
             </div>
-        </div>
+        </footer>
     </article>
 
     <!-- Settings dialog. This section is completely unchanged.  -->
