@@ -4,5 +4,11 @@
   "description": "Going to Kindergarten Rocket Launch System",
   "main": "index.html",
   "author": "Juja",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
 }

@@ -27,13 +27,19 @@ const pieOption = { pieSliceText: 'value', pieHole: 0.4, height: '100%', width: 
 let pie;
 
 let holiday;
-const defaultSequence = [
+const morningSequence = [
     { ja: 'ごはん', en: 'breakfast' },
     { ja: 'はみがき', en: 'dental brushing' },
     { ja: 'おきがえ', en: 'change of clothes' },
     { ja: 'もちもの', en: 'Preparation of belongings' }
 ];
-let sequences = [...defaultSequence];
+const afterSequence = [
+    { ja: 'かばんをおく', en: 'Put down bag' },
+    { ja: 'てあらい', en: 'Hand wash' },
+    { ja: 'しゅくだい', en: 'Homework' },
+    { ja: 'もちものかくにん', en: 'Check belongings' }
+];
+let sequences = [...morningSequence];
 
 let startTime = new Date(); // シーケンス開始時刻
 let goalTime = new Date(startTime);
@@ -76,7 +82,7 @@ function loadSettings() {
         sequences.splice(-1)
     }
     else {
-        sequences = [...defaultSequence];
+        sequences = [...morningSequence];
     }
     drawChart();
 }
@@ -122,10 +128,12 @@ function drawChart() {
     dataTable2.addColumn('string', "名前");
     dataTable2.addColumn('number', "秒");
 
-
     let nowDate = new Date()
+    // モードによってラベルを切り替え
+    let modeDraw = document.getElementById('sequenceMode')?.value || 'morning';
+    const label = modeDraw === 'morning' ? 'あさ' : '帰宅';
     dataTable.addRows(sequences.map((s, i) => {
-        return ["あさ", s.ja, new Date(nowDate.getTime() + i),
+        return [label, s.ja, new Date(nowDate.getTime() + i),
             new Date(nowDate.getTime() + i + 1)];
     }));
 
@@ -136,8 +144,16 @@ function drawChart() {
 
     document.getElementById("current").innerHTML = dataTable.getValue(0, 1);
 
+    // timeline-infoの表示/非表示もここで念のため制御
+    if (modeDraw === 'morning') {
+        document.getElementById('timeline-info').style.display = '';
+    } else {
+        document.getElementById('timeline-info').style.display = 'none';
+    }
+    // ボタン類は常に表示
+    document.querySelector('.nav-controls').style.display = '';
+    document.querySelector('.action-controls').style.display = '';
 }
-
 
 function nextChart() {
     document.getElementById('nextButton').disabled = true;
@@ -221,12 +237,21 @@ function start() {
     document.getElementById('nextButton').disabled = false;
     document.getElementById('prevButton').disabled = true; // Disable previous at start
     document.getElementById('settingButton').disabled = true;
+    document.getElementById('sequenceMode').disabled = true; // モード切替を無効化
     const nextAction = dataTable.getValue(0, 1);
+    const mode = document.getElementById('sequenceMode')?.value || 'morning';
     if (holiday) {
-        speech(`休みの朝のおしたくを開始しましょう！。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for the morning of the vacation!. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
-    }
-    else {
-        speech(`登校準備を開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for elementary school attendance. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+        if (mode === 'morning') {
+            speech(`休みの朝のおしたくを開始しましょう！。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for the morning of the vacation!. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+        } else {
+            speech(`休みの帰宅後のおしたくを開始しましょう！。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for after school on the vacation!. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+        }
+    } else {
+        if (mode === 'morning') {
+            speech(`登校準備を開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for elementary school attendance. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+        } else {
+            speech(`帰宅後のおしたくを開始します。最初のシーケンス、${nextAction} を開始してください。`, `Start the preparation for after school. Start the first sequence, ${sequences.find(s => s.ja === nextAction).en}.`);
+        }
     }
 
     let nowDate = new Date();
@@ -304,15 +329,21 @@ function saveSettings() {
 }
 
 function saveHistory(currentTimes) {
-    let history = JSON.parse(localStorage.getItem('sequenceHistory') || '[]');
-    history.push(currentTimes);
+    const mode = document.getElementById('sequenceMode')?.value || 'morning';
+    let allHistory = JSON.parse(localStorage.getItem('sequenceHistory') || '{}');
+    if (typeof allHistory !== 'object' || Array.isArray(allHistory)) allHistory = {};
+    if (!allHistory[mode]) allHistory[mode] = [];
+    allHistory[mode].push(currentTimes);
     // 履歴は直近20件だけ保存
-    if (history.length > 20) history = history.slice(-20);
-    localStorage.setItem('sequenceHistory', JSON.stringify(history));
+    if (allHistory[mode].length > 20) allHistory[mode] = allHistory[mode].slice(-20);
+    localStorage.setItem('sequenceHistory', JSON.stringify(allHistory));
 }
 
 function getHistory() {
-    return JSON.parse(localStorage.getItem('sequenceHistory') || '[]');
+    const mode = document.getElementById('sequenceMode')?.value || 'morning';
+    let allHistory = JSON.parse(localStorage.getItem('sequenceHistory') || '{}');
+    if (typeof allHistory !== 'object' || Array.isArray(allHistory)) allHistory = {};
+    return allHistory[mode] || [];
 }
 
 function calcAverage(history) {
@@ -362,3 +393,53 @@ function showCompare(currentTimes) {
     let barChart = new google.visualization.BarChart(document.getElementById('barchart'));
     barChart.draw(barData, barOptions);
 }
+
+function changeSequenceMode() {
+    const mode = document.getElementById('sequenceMode').value;
+    if (mode === 'morning') {
+        sequences = [...morningSequence];
+        timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
+        timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
+        timelineOptions.timeline.label = 'あさ';
+        document.getElementById('timeline-info').style.display = '';
+    } else {
+        sequences = [...afterSequence];
+        timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
+        timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
+        timelineOptions.timeline.label = '帰宅';
+        document.getElementById('timeline-info').style.display = 'none';
+    }
+    position = 0;
+    drawChart();
+    updateTimelineInfo();
+}
+
+function clearHistory() {
+    if (window.confirm('本当に履歴を全て削除しますか？')) {
+        localStorage.removeItem('sequenceHistory');
+        document.getElementById('compareArea').innerHTML = '';
+        alert('履歴を削除しました。');
+    }
+}
+
+// テストしやすいようにユーティリティ関数をutils.jsに移動
+document.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const modeSelect = document.getElementById('sequenceMode');
+    // 土日なら自動的にholiday
+    const day = now.getDay(); // 0:日, 6:土
+    if (day === 0 || day === 6) {
+        holiday = true;
+        const holidayCheckbox = document.getElementById('holiday');
+        if (holidayCheckbox) holidayCheckbox.checked = true;
+    }
+    if (modeSelect) {
+        if (hour < 12) {
+            modeSelect.value = 'morning';
+        } else {
+            modeSelect.value = 'after';
+        }
+        changeSequenceMode();
+    }
+});

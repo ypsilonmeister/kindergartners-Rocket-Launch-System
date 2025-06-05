@@ -9,7 +9,7 @@ body {
 article {
   min-height: 100%;
   display: grid;
-  grid-template-rows: 1fr 1.5fr 3fr auto;
+  grid-template-rows: minmax(60px, 120px) 1.5fr 3fr auto;
   grid-template-columns: 100%;
 }
 
@@ -72,6 +72,9 @@ section>header {
   padding: 30px 30%;
   display: flex;
   flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 #settingContent>* {

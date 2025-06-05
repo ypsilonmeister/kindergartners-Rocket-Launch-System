@@ -46,6 +46,13 @@
             <div id="barchart" style="height:50%"></div>
 
         </div>
+        <div style="margin-bottom: 12px; text-align: center;">
+            <label for="sequenceMode" style="font-weight:bold;">モード：</label>
+            <select id="sequenceMode" onchange="changeSequenceMode()">
+                <option value="morning">あさ</option>
+                <option value="after">おかえり</option>
+            </select>
+        </div>
         <div>
 
             <div class="nav-controls">
@@ -57,7 +64,7 @@
             <div class="action-controls">
                 <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
                         class="fa-solid fa-gear">setting</i></button>
-            </div>            
+            </div>
         </div>
     </article>
 
@@ -78,6 +85,7 @@
                     目標時刻:
                     <input type="time" id="goalTimeInput">
                 </div>
+                <button onclick="clearHistory();" class="danger" style="margin-top:10px;">履歴クリア</button>
             </div>
             <footer>
                 <div class=center>
