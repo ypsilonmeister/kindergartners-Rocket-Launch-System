@@ -1,5 +1,5 @@
 google.charts.load("current", { packages: ["timeline", "corechart"] });
-google.charts.setOnLoadCallback(loadSettings);
+google.charts.setOnLoadCallback(initialize);
 let dataTable;
 let dataTable2;
 const timelineOptions = {
@@ -29,7 +29,19 @@ const pieOption = {
     height: "100%",
     width: "100%",
 };
+
+const barOptions = {
+    width: "100%",
+    height: "100%",
+    legend: { position: "top" },
+    hAxis: { title: "秒", minValue: 0 },
+    vAxis: { title: "シーケンス" },
+    chartArea: { left: 80, width: "70%", height: "70%" },
+    colors: ["#0176d3", "#ffb300", "#888"],
+    isStacked: false,
+};
 let pie;
+let barChart;
 
 let holiday;
 const morningSequence = [
@@ -168,7 +180,10 @@ function drawChart() {
 
     pie = new google.visualization.PieChart(document.getElementById("piechart"));
     pie.draw(dataTable2, pieOption);
-
+    barChart = new google.visualization.BarChart(
+        document.getElementById("barchart")
+    );
+    barChart.draw(dataTable2, barOptions);
     document.getElementById("current").innerHTML = dataTable.getValue(0, 1);
 
     // timeline-infoの表示/非表示もここで念のため制御
@@ -184,7 +199,7 @@ function drawChart() {
 
 function nextChart() {
     document.getElementById("nextButton").disabled = true;
-    document.getElementById("prevButton").disabled = false; // Enable previous button
+    document.getElementById("prevButton").disabled = true; // Enable previous button
 
     countUp = 0;
     let nowDate = new Date();
@@ -196,11 +211,13 @@ function nextChart() {
         { v: sec, f: `${sec}秒` },
     ]);
     pie.draw(dataTable2, pieOption);
+    barChart.draw(dataTable2, barOptions);
+
     position += 1;
     if (dataTable.getNumberOfRows() === position) {
         clearInterval(timeId);
         clearInterval(timeId2);
-        timeid = undefined;
+        timeId = undefined;
         timeId2 = undefined;
         const currentTimes = [];
         for (let i = 0; i < dataTable2.getNumberOfRows(); i++) {
@@ -221,11 +238,13 @@ function nextChart() {
         }
         document.getElementById("nextButton").disabled = true;
         document.getElementById("prevButton").disabled = false; // Still allow going back
+        document.getElementById("reloadButton").disabled = false;
         pie.draw(dataTable2, pieOption);
         return;
     }
     setTimeout(() => {
         document.getElementById("nextButton").disabled = false;
+        document.getElementById("prevButton").disabled = false;
     }, 1000);
     const nextAction = dataTable.getValue(position, 1);
     document.getElementById("current").innerHTML = nextAction;
@@ -439,21 +458,6 @@ function showCompare(currentTimes) {
         if (avg.length) row.push(avg[i] || 0);
         barData.addRow(row);
     }
-
-    let barOptions = {
-        width: "100%",
-        height: "100%",
-        legend: { position: "top" },
-        hAxis: { title: "秒", minValue: 0 },
-        vAxis: { title: "シーケンス" },
-        chartArea: { left: 80, width: "70%", height: "70%" },
-        colors: ["#0176d3", "#ffb300", "#888"],
-        isStacked: false,
-    };
-
-    let barChart = new google.visualization.BarChart(
-        document.getElementById("barchart")
-    );
     barChart.draw(barData, barOptions);
 }
 
@@ -485,8 +489,8 @@ function clearHistory() {
     }
 }
 
-// テストしやすいようにユーティリティ関数をutils.jsに移動
-document.addEventListener("DOMContentLoaded", () => {
+function initialize() {
+     loadSettings();
     const now = new Date();
     const hour = now.getHours();
     const modeSelect = document.getElementById("sequenceMode");
@@ -505,4 +509,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         changeSequenceMode();
     }
-});
+}
+
+
+// テストしやすいようにユーティリティ関数をutils.jsに移動
+document.addEventListener("DOMContentLoaded", initialize);

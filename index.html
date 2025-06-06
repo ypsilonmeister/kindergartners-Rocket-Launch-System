@@ -41,10 +41,10 @@
             <div id="timeline"></div>
 
             <!--Pie chart  -->
-            <div>
-                <div id="piechart" style="height:50%"></div>
+            <div id="charts" style="flex-grow: 1; height: 100%; display: flex; flex-direction: column;">
+                <div id="piechart" style="flex-grow: 1;"></div>
 
-                <div id="barchart" style="height:50%"></div>
+                <div id="barchart" style="flex-grow: 1;"></div>
 
             </div>
         </div>
@@ -61,6 +61,7 @@
                 <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
                 <button onclick="nextChart();" id="nextButton" class="styled" disabled><span id='current'></span>
                     Completed</button>
+                <button onclick="window.location.reload();" id="reloadButton" class="styled" disabled>リロード</button>
             </div>
             <div class="action-controls">
                 <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
