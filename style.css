@@ -1,9 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;900&display=swap');
+
 html,
 body {
   width: 100%;
   height: 100%;
   overflow: hidden;
   margin: 0;
+  background: #000000;
+  color: #00ff41;
+  font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+}
+
+/* Animated grid background like SpaceX telemetry */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Scanline effect */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    transparent 50%,
+    rgba(0, 255, 65, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 1;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100%); }
 }
 
 article {
@@ -11,6 +56,10 @@ article {
   display: grid;
   grid-template-rows: 1fr 1.5fr 3fr auto;
   grid-template-columns: 100%;
+  padding: 20px;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 
@@ -23,6 +72,14 @@ article {
 dialog {
   height: 100%;
   width: 100%;
+  background: rgba(0, 0, 0, 0.98);
+  backdrop-filter: blur(10px);
+  border: 2px solid #00ff41;
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 30px rgba(0, 255, 65, 0.1),
+    0 0 50px rgba(0, 255, 65, 0.3),
+    0 0 100px rgba(0, 255, 65, 0.1);
 }
 
 section {
@@ -30,6 +87,7 @@ section {
   grid-template-rows: auto 1fr auto;
   grid-template-columns: 100%;
   min-height: 100%;
+  padding: 30px;
 }
 
 .modal-close {
@@ -40,20 +98,43 @@ section {
   background: none;
   background-color: transparent;
   background-clip: border-box;
-  border: 1px solid transparent;
-  border-radius: 0.25rem;
+  border: 2px solid #00ff41;
+  border-radius: 0;
   line-height: 1.875rem;
   text-decoration: none;
   white-space: normal;
   user-select: none;
   align-self: flex-start;
-  font-size: 40px;
+  font-size: 30px;
+  color: #00ff41;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #00ff41;
+  color: #000;
+  box-shadow: 0 0 20px #00ff41;
+  text-shadow: none;
 }
 
 section > header {
   display: grid;
   grid-template-rows: 100%;
   grid-template-columns: 1fr auto;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00ff41;
+  margin-bottom: 20px;
+  font-family: 'Orbitron', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+  border-bottom: 2px solid #00ff41;
+  padding-bottom: 10px;
 }
 
 .center {
@@ -71,6 +152,10 @@ section > header {
   padding: 30px 30%;
   display: flex;
   flex-wrap: wrap;
+  background: rgba(0, 20, 10, 0.6);
+  border-radius: 0;
+  border: 1px solid #00ff41;
+  box-shadow: inset 0 0 20px rgba(0, 255, 65, 0.1);
 }
 
 #settingContent > * {
@@ -94,19 +179,103 @@ section > header {
 }
 
 .styled {
-    border: 1px gray solid;
+    border: 2px solid #00ff41;
     line-height: 2.5;
-    padding: 0 30px; /* Reduced padding to save space */
+    padding: 0 30px;
     font-size: 1rem;
     text-align: center;
-    border-radius: 5px;
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #00ff41;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 10px) 0,
+        100% 10px,
+        100% 100%,
+        10px 100%,
+        0 calc(100% - 10px)
+    );
+}
+
+.styled::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.styled:hover::before {
+    left: 100%;
+}
+
+.styled:hover {
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow:
+        0 0 20px rgba(0, 255, 65, 0.6),
+        inset 0 0 20px rgba(0, 255, 65, 0.1);
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+}
+
+.styled:active {
+    background: rgba(0, 255, 65, 0.2);
+    transform: scale(0.98);
+}
+
+.styled.disabled,
+.styled:disabled,
+button.styled[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(0, 255, 65, 0.3);
+    color: rgba(0, 255, 65, 0.5);
+    pointer-events: none;
+}
+
+.styled.disabled:hover,
+.styled:disabled:hover,
+button.styled[disabled]:hover {
+    transform: none;
+    box-shadow: none;
+    background: rgba(0, 0, 0, 0.8);
+    text-shadow: none;
+}
+
+.styled.disabled::before,
+.styled:disabled::before,
+button.styled[disabled]::before {
+    display: none;
 }
 
 .save {
-    background-color: #0176d3;
-    color: #fff;
-    border-color: #0176d3;
-    margin-left: auto; /* Adjusts the save button position */
+    background: #00ff41;
+    color: #000;
+    border-color: #00ff41;
+    margin-left: auto;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+    font-weight: 700;
+}
+
+.save::before {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.save:hover {
+    background: #00ff41;
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    color: #000;
+    text-shadow: none;
 }
 
 #timeline-info {
@@ -114,58 +283,423 @@ section > header {
     align-items: center;
     margin-bottom: 10px;
     width: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 0;
+    border: 2px solid #00ff41;
+    position: relative;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 15px) 0,
+        100% 15px,
+        100% 100%,
+        15px 100%,
+        0 calc(100% - 15px)
+    );
+}
+
+#timeline-info::before {
+    content: 'MISSION TIMER';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #000;
+    color: #00ff41;
+    padding: 0 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    font-family: 'Orbitron', monospace;
 }
 
 #startTime, #goalTime {
-    width: 80px;
+    width: 100px;
     text-align: center;
-    font-size: 1em;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #00ff41;
+    text-shadow: 0 0 15px rgba(0, 255, 65, 0.8);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
 }
 
 #time-bar {
     flex: 1;
-    height: 80%;
-    background: #eee;
-    margin: 0 10px;
+    height: 25px;
+    background: rgba(0, 20, 10, 0.8);
+    margin: 0 15px;
     position: relative;
-    border-radius: 4px;
+    border-radius: 0;
+    border: 1px solid #00ff41;
+    box-shadow: inset 0 0 15px rgba(0, 255, 65, 0.2);
+    overflow: hidden;
+}
+
+#time-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 255, 65, 0.1) 10px,
+        rgba(0, 255, 65, 0.1) 11px
+    );
 }
 
 #time-indicator {
     position: absolute;
-    top: -4px;
-    width: 2px;
-    height: 105%;
-    background: #0176d3;
-    border-radius: 1px;
+    top: -2px;
+    width: 4px;
+    height: calc(100% + 4px);
+    background: #00ff41;
+    border-radius: 0;
     transition: left 0.2s;
+    box-shadow:
+        0 0 20px rgba(0, 255, 65, 1),
+        0 0 40px rgba(0, 255, 65, 0.5);
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 #compareArea table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-    background: #fafcff;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 0;
+    overflow: hidden;
+    border: 2px solid #00ff41;
 }
 
 #compareArea th, #compareArea td {
-    border: 1px solid #ccc;
-    padding: 6px 8px;
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    padding: 12px 15px;
     text-align: center;
     font-size: 1em;
+    color: #00ff41;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
 }
 
 #compareArea th {
-    background: #e6f0fa;
-    font-weight: bold;
+    background: rgba(0, 255, 65, 0.2);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.85em;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
 }
 
 #compareArea tr:nth-child(2) td {
-    background: #e0ffe0; /* 今回 */
+    background: rgba(0, 255, 65, 0.1);
+    border-left: 3px solid #00ff41;
+    color: #00ff41;
+    text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
 }
 #compareArea tr:nth-child(3) td {
-    background: #fffbe0; /* 前回 */
+    background: rgba(0, 200, 255, 0.1);
+    border-left: 3px solid #00c8ff;
+    color: #00c8ff;
+    text-shadow: 0 0 8px rgba(0, 200, 255, 0.5);
 }
 #compareArea tr:nth-child(4) td {
-    background: #f0f0f0; /* 平均 */
+    background: rgba(255, 200, 0, 0.1);
+    border-left: 3px solid #ffc800;
+    color: #ffc800;
+    text-shadow: 0 0 8px rgba(255, 200, 0, 0.5);
+}
+
+/* Chart containers */
+#piechart, #barchart {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-radius: 0;
+    padding: 20px;
+    border: 2px solid #00ff41;
+    box-shadow:
+        inset 0 0 20px rgba(0, 255, 65, 0.1),
+        0 0 30px rgba(0, 255, 65, 0.2);
+    position: relative;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 12px) 0,
+        100% 12px,
+        100% 100%,
+        12px 100%,
+        0 calc(100% - 12px)
+    );
+}
+
+#piechart::before {
+    content: 'TELEMETRY DATA';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #000;
+    color: #00ff41;
+    padding: 0 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    font-family: 'Orbitron', monospace;
+}
+
+#barchart::before {
+    content: 'COMPARISON ANALYTICS';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #000;
+    color: #00ff41;
+    padding: 0 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    font-family: 'Orbitron', monospace;
+}
+
+#timeline {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 0;
+    padding: 20px;
+    border: 2px solid #00ff41;
+    box-shadow:
+        inset 0 0 20px rgba(0, 255, 65, 0.1),
+        0 0 30px rgba(0, 255, 65, 0.2);
+    position: relative;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 12px) 0,
+        100% 12px,
+        100% 100%,
+        12px 100%,
+        0 calc(100% - 12px)
+    );
+}
+
+#timeline::before {
+    content: 'SEQUENCE TIMELINE';
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: #000;
+    color: #00ff41;
+    padding: 0 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    font-family: 'Orbitron', monospace;
+}
+
+/* Input styling */
+input[type="time"],
+input[type="checkbox"] {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff41;
+    border-radius: 0;
+    color: #00ff41;
+    padding: 10px;
+    transition: all 0.3s ease;
+    font-family: 'Orbitron', monospace;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+}
+
+input[type="time"]:focus {
+    outline: none;
+    border-color: #00ff41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.6), inset 0 0 10px rgba(0, 255, 65, 0.1);
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: #00ff41;
+}
+
+label {
+    color: #00ff41;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Rajdhani', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+label:hover {
+    color: #00ff41;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+}
+
+/* Navigation and action controls */
+.nav-controls, .action-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Settings button with SpaceX effect */
+.setting-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff41;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+    transition: all 0.3s ease;
+    clip-path: polygon(
+        0 0,
+        calc(100% - 8px) 0,
+        100% 8px,
+        100% 100%,
+        8px 100%,
+        0 calc(100% - 8px)
+    );
+    color: #00ff41;
+}
+
+.setting-button:hover:not(:disabled) {
+    transform: scale(1.05);
+    background: rgba(0, 255, 65, 0.1);
+    box-shadow:
+        0 0 30px rgba(0, 255, 65, 0.6),
+        inset 0 0 20px rgba(0, 255, 65, 0.1);
+    color: #00ff41;
+}
+
+.setting-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(0, 255, 65, 0.3);
+    color: rgba(0, 255, 65, 0.5);
+    pointer-events: none;
+}
+
+.setting-button i {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.8));
+}
+
+/* Status indicator styling */
+#current {
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+/* Footer styling */
+footer {
+    border-top: 2px solid #00ff41;
+    padding-top: 20px;
+    margin-top: 20px;
+}
+
+/* Additional glow effects for interactive elements */
+button:not(.disabled):active {
+    animation: buttonFlash 0.3s ease;
+}
+
+@keyframes buttonFlash {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.6); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 65, 1); }
+}
+
+/* Mission control corner decorations */
+article::before,
+article::after {
+    content: '';
+    position: fixed;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #00ff41;
+    opacity: 0.5;
+    z-index: 10;
+}
+
+article::before {
+    top: 10px;
+    left: 10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+article::after {
+    bottom: 10px;
+    right: 10px;
+    border-left: none;
+    border-top: none;
+}
+
+/* Google Charts customization */
+#timeline svg text,
+#piechart svg text,
+#barchart svg text {
+    fill: #00ff41 !important;
+    font-family: 'Rajdhani', sans-serif !important;
+}
+
+#timeline svg rect[fill],
+#piechart svg path[fill],
+#barchart svg rect[fill] {
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Timeline bars glow effect */
+#timeline svg g > rect[fill="#00ff41"],
+#timeline svg g > rect[fill="rgb(0, 255, 65)"] {
+    filter: drop-shadow(0 0 8px #00ff41);
+}
+
+/* Chart background */
+#timeline svg > rect:first-child,
+#piechart svg > rect:first-child,
+#barchart svg > rect:first-child {
+    fill: transparent !important;
+}
+
+/* Grid lines in charts */
+#barchart svg line,
+#timeline svg line {
+    stroke: rgba(0, 255, 65, 0.2) !important;
+}
+
+/* Tooltip styling */
+.google-visualization-tooltip {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 2px solid #00ff41 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5) !important;
+    padding: 10px !important;
+    font-family: 'Rajdhani', sans-serif !important;
+}
+
+.google-visualization-tooltip span {
+    color: #00ff41 !important;
+    font-family: 'Rajdhani', sans-serif !important;
+}
+
+/* Mission status text */
+#current {
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+    animation: statusBlink 2s ease-in-out infinite;
+}
+
+@keyframes statusBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
