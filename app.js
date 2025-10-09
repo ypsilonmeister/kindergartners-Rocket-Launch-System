@@ -9,11 +9,24 @@ const timelineOptions = {
     },
     alternatingRowStyle: false,
     avoidOverlappingGridLines: false,
+    backgroundColor: 'transparent',
     timeline: {
-        rowLabelStyle: { fontSize: 24 },
-        barLabelStyle: { fontSize: 24 },
+        rowLabelStyle: {
+            fontSize: 20,
+            color: '#00ff41',
+            fontName: 'Rajdhani'
+        },
+        barLabelStyle: {
+            fontSize: 18,
+            color: '#000',
+            fontName: 'Rajdhani'
+        },
         howRowLabels: false,
+        rowLabelStyle: { fontSize: 24 },
+        barLabelStyle: { fontSize: 24 }
     },
+    colors: ['#00ff41', '#00c8ff', '#ffc800'],
+    fontName: 'Rajdhani'
 };
 let chart;
 let c;
@@ -24,6 +37,41 @@ let timeId;
 let timeId2;
 let countUp = 0;
 const pieOption = {
+    pieSliceText: 'value',
+    pieHole: 0.4,
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'transparent',
+    colors: ['#00ff41', '#00c8ff', '#ffc800', '#ff00ff'],
+    legend: {
+        position: 'right',
+        textStyle: {
+            color: '#00ff41',
+            fontSize: 14,
+            fontName: 'Rajdhani',
+            bold: true
+        }
+    },
+    pieSliceTextStyle: {
+        color: '#000',
+        fontSize: 16,
+        fontName: 'Orbitron',
+        bold: true
+    },
+    chartArea: {
+        left: 20,
+        top: 20,
+        width: '90%',
+        height: '90%'
+    },
+    pieSliceBorderColor: '#000',
+    tooltip: {
+        textStyle: {
+            color: '#00ff41',
+            fontSize: 14,
+            fontName: 'Rajdhani'
+        }
+    }
     pieSliceText: "value",
     pieHole: 0.4,
     height: "100%",
@@ -198,8 +246,10 @@ function drawChart() {
 }
 
 function nextChart() {
-    document.getElementById("nextButton").disabled = true;
-    document.getElementById("prevButton").disabled = true; // Enable previous button
+    document.getElementById('nextButton').disabled = true;
+    document.getElementById('nextButton').classList.add('disabled');
+    document.getElementById('prevButton').disabled = false;
+    document.getElementById('prevButton').classList.remove('disabled');
 
     countUp = 0;
     let nowDate = new Date();
@@ -236,23 +286,24 @@ function nextChart() {
                 "All sequences have been completed. Please start your free time until school time"
             );
         }
-        document.getElementById("nextButton").disabled = true;
-        document.getElementById("prevButton").disabled = false; // Still allow going back
+        document.getElementById('nextButton').disabled = true;
+        document.getElementById('nextButton').classList.add('disabled');
+        document.getElementById('prevButton').disabled = false;
+        document.getElementById('prevButton').classList.remove('disabled');
         document.getElementById("reloadButton").disabled = false;
+        document.getElementById("reloadButton").classList.remove('disabled');
         pie.draw(dataTable2, pieOption);
         return;
     }
     setTimeout(() => {
-        document.getElementById("nextButton").disabled = false;
-        document.getElementById("prevButton").disabled = false;
-    }, 1000);
-    const nextAction = dataTable.getValue(position, 1);
-    document.getElementById("current").innerHTML = nextAction;
-    speech(
-        `次のシーケンスは、「${nextAction}」 です。すみやかに移行してください。`,
-        `The next sequence is “${sequences.find((s) => s.ja === nextAction).en
-        }”. Please execute the transition as soon as possible.`
-    );
+        document.getElementById('nextButton').disabled = false;
+        document.getElementById('nextButton').classList.remove('disabled');
+        document.getElementById('prevButton').disabled = false;
+        document.getElementById('prevButton').classList.remove('disabled');
+    }, 1000)
+    const nextAction = dataTable.getValue(position, 1)
+    document.getElementById("current").innerHTML = nextAction
+    speech(`次のシーケンスは、「${nextAction}」 です。すみやかに移行してください。`, `The next sequence is "${sequences.find(s => s.ja === nextAction).en}". Please execute the transition as soon as possible.`);
 }
 
 function prevChart() {
@@ -282,9 +333,11 @@ function prevChart() {
     );
 
     // Enable/disable buttons as needed
-    document.getElementById("nextButton").disabled = false;
+    document.getElementById('nextButton').disabled = false;
+    document.getElementById('nextButton').classList.remove('disabled');
     if (position === 0) {
-        document.getElementById("prevButton").disabled = true;
+        document.getElementById('prevButton').disabled = true;
+        document.getElementById('prevButton').classList.add('disabled');
     }
     if (!timeId) {
         timeId = setInterval(updateChart, 10);
@@ -293,11 +346,14 @@ function prevChart() {
 }
 
 function start() {
-    document.getElementById("startButton").disabled = true;
-    document.getElementById("nextButton").disabled = false;
-    document.getElementById("prevButton").disabled = true; // Disable previous at start
-    document.getElementById("settingButton").disabled = true;
-    document.getElementById("sequenceMode").disabled = true; // モード切替を無効化
+    document.getElementById('startButton').disabled = true;
+    document.getElementById('startButton').classList.add('disabled');
+    document.getElementById('nextButton').disabled = false;
+    document.getElementById('nextButton').classList.remove('disabled');
+    document.getElementById('prevButton').disabled = true;
+    document.getElementById('prevButton').classList.add('disabled');
+    document.getElementById('settingButton').disabled = true;
+    document.getElementById('settingButton').classList.add('disabled');
     const nextAction = dataTable.getValue(0, 1);
     const mode = document.getElementById("sequenceMode")?.value || "morning";
     if (holiday) {
@@ -458,6 +514,71 @@ function showCompare(currentTimes) {
         if (avg.length) row.push(avg[i] || 0);
         barData.addRow(row);
     }
+
+    let barOptions = {
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'transparent',
+        legend: {
+            position: 'top',
+            textStyle: {
+                color: '#00ff41',
+                fontSize: 14,
+                fontName: 'Rajdhani',
+                bold: true
+            }
+        },
+        hAxis: {
+            title: '秒 (SECONDS)',
+            minValue: 0,
+            textStyle: {
+                color: '#00ff41',
+                fontSize: 12,
+                fontName: 'Rajdhani'
+            },
+            titleTextStyle: {
+                color: '#00ff41',
+                fontSize: 14,
+                fontName: 'Orbitron',
+                bold: true
+            },
+            gridlines: {
+                color: '#00ff41',
+                opacity: 0.2
+            }
+        },
+        vAxis: {
+            title: 'シーケンス (SEQUENCE)',
+            textStyle: {
+                color: '#00ff41',
+                fontSize: 12,
+                fontName: 'Rajdhani'
+            },
+            titleTextStyle: {
+                color: '#00ff41',
+                fontSize: 14,
+                fontName: 'Orbitron',
+                bold: true
+            },
+            gridlines: {
+                color: '#00ff41',
+                opacity: 0.2
+            }
+        },
+        chartArea: { left: 120, top: 50, width: '65%', height: '70%' },
+        colors: ['#00ff41', '#00c8ff', '#ffc800'],
+        isStacked: false,
+        bar: { groupWidth: '70%' },
+        tooltip: {
+            textStyle: {
+                color: '#00ff41',
+                fontSize: 14,
+                fontName: 'Rajdhani'
+            }
+        }
+    };
+
+    let barChart = new google.visualization.BarChart(document.getElementById('barchart'));
     barChart.draw(barData, barOptions);
 }
 
