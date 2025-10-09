@@ -72,10 +72,6 @@ const pieOption = {
             fontName: 'Rajdhani'
         }
     }
-    pieSliceText: "value",
-    pieHole: 0.4,
-    height: "100%",
-    width: "100%",
 };
 
 const barOptions = {
@@ -589,13 +585,13 @@ function changeSequenceMode() {
         timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.label = "あさ";
-        document.getElementById("timeline-info").style.visibility = "visible";
+        document.getElementById("timeline-info").style.display = "flex";
     } else {
         sequences = [...afterSequence];
         timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
         timelineOptions.timeline.label = "帰宅";
-        document.getElementById("timeline-info").style.visibility = "hidden";
+        document.getElementById("timeline-info").style.display = "none";
     }
     position = 0;
     drawChart();
@@ -611,7 +607,7 @@ function clearHistory() {
 }
 
 function initialize() {
-     loadSettings();
+    loadSettings();
     const now = new Date();
     const hour = now.getHours();
     const modeSelect = document.getElementById("sequenceMode");
@@ -631,7 +627,3 @@ function initialize() {
         changeSequenceMode();
     }
 }
-
-
-// テストしやすいようにユーティリティ関数をutils.jsに移動
-document.addEventListener("DOMContentLoaded", initialize);

@@ -4,7 +4,7 @@ html,
 body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
   margin: 0;
   background: #000000;
   color: #00ff41;
@@ -52,11 +52,11 @@ body::before {
 }
 
 article {
-  min-height: 100%;
-  display: grid;
-  grid-template-rows: 1fr 1.5fr 3fr auto;
-  grid-template-columns: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
+  padding-bottom: 40px;
   gap: 20px;
   position: relative;
   z-index: 2;
@@ -66,6 +66,8 @@ article {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  min-height: 0;
 }
 
 #buttons {
@@ -428,6 +430,11 @@ button.styled[disabled]::before {
 }
 
 /* Chart containers */
+#charts {
+    flex: 2;
+    min-height: 400px;
+}
+
 #piechart, #barchart {
     background: rgba(0, 0, 0, 0.8) !important;
     border-radius: 0;
@@ -445,6 +452,7 @@ button.styled[disabled]::before {
         12px 100%,
         0 calc(100% - 12px)
     );
+    min-height: 200px;
 }
 
 #piechart::before {
@@ -492,6 +500,8 @@ button.styled[disabled]::before {
         12px 100%,
         0 calc(100% - 12px)
     );
+    flex: 1;
+    min-height: 200px;
 }
 
 #timeline::before {
@@ -615,6 +625,7 @@ footer {
     border-top: 2px solid #00ff41;
     padding-top: 20px;
     margin-top: 20px;
+    flex-shrink: 0;
 }
 
 /* Additional glow effects for interactive elements */
