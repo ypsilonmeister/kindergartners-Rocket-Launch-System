@@ -26,41 +26,48 @@
 <body>
     <!-- Main content  -->
     <article>
-        <!-- Timeline element (unchanged)-->
-        <div id="timeline-info">
-            <span id="startTime"></span>
-            <div id="time-bar">
-                <div id="time-indicator"></div>
+        <div id="contents">
+            <!-- Timeline element (unchanged)-->
+            <div id="timeline-info" style="height: 100px;">
+                <span id="startTime"></span>
+                <div id="time-bar">
+                    <div id="time-indicator">
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
+                <span id="goalTime"></span>
+
             </div>
-            <span id="goalTime"></span>
+            <div id="timeline"></div>
 
+            <!--Pie chart  -->
+            <div id="charts" style="flex-grow: 1; height: 100%; display: flex; flex-direction: column;">
+                <div id="piechart" style="flex-grow: 1;"></div>
+
+                <div id="barchart" style="flex-grow: 1;"></div>
+
+            </div>
         </div>
-        <div id="timeline"></div>
-
-        <!--Pie chart  -->
-        <div>
-            <div id="piechart" style="height:50%"></div>
-
-            <div id="barchart" style="height:50%"></div>
-
-        </div>
-        <!-- Navigation controls  -->
-        <div class="nav-controls">
-            <!-- Button to go back one unit. This button is disabled by default. It becomes enabled when the current sequence starts.  -->
-            <button onclick="prevChart();" id="prevButton" class="styled disabled">前に戻る</button>
-            <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
-
-            <!-- Button to advance one unit. The current sequence starts here and stops when the timeline reaches the end of this sequence. If the sequence is not started, then this button becomes enabled once the current sequence starts.  -->
-            <button onclick="nextChart();" id="nextButton" class="styled disabled"><span id='current'></span>
-                Completed</button>
-        </div>
-
-        <!-- Action controls  -->
-        <div class="action-controls">
-            <!-- Button to open the settings dialog (unchanged).  -->
-            <button onclick="openSettings();" id="settingButton" class="styled save setting-button"><i
-                    class="fa-solid fa-gear"></i></button>
-        </div>
+        <footer>
+            <div style="margin-bottom: 12px; text-align: center;">
+                <label for="sequenceMode" style="font-weight:bold;">モード：</label>
+                <select id="sequenceMode" onchange="changeSequenceMode()">
+                    <option value="morning">あさ</option>
+                    <option value="after">おかえり</option>
+                </select>
+            </div>
+            <div class="nav-controls">
+                <button onclick="prevChart();" id="prevButton" class="styled " disabled>前に戻る</button>
+                <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
+                <button onclick="nextChart();" id="nextButton" class="styled" disabled><span id='current'></span>
+                    Completed</button>
+                <button onclick="window.location.reload();" id="reloadButton" class="styled" disabled>リロード</button>
+            </div>
+            <div class="action-controls">
+                <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
+                        class="fa-solid fa-gear">setting</i></button>
+            </div>
+        </footer>
     </article>
 
     <!-- Settings dialog. This section is completely unchanged.  -->
@@ -80,6 +87,7 @@
                     目標時刻:
                     <input type="time" id="goalTimeInput">
                 </div>
+                <button onclick="clearHistory();" class="danger" style="margin-top:10px;">履歴クリア</button>
             </div>
             <footer>
                 <div class=center>
