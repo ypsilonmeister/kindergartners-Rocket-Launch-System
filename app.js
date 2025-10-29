@@ -2,6 +2,8 @@ google.charts.load("current", { packages: ["timeline", "corechart"] });
 google.charts.setOnLoadCallback(initialize);
 let dataTable;
 let dataTable2;
+
+// No longer needed - using proper Google Charts backgroundColor options instead
 const timelineOptions = {
     animation: {
         startup: true,
@@ -9,22 +11,33 @@ const timelineOptions = {
     },
     alternatingRowStyle: false,
     avoidOverlappingGridLines: false,
-    backgroundColor: 'transparent',
+    backgroundColor: { fill: 'transparent', fillOpacity: 0 },
     timeline: {
         rowLabelStyle: {
             fontSize: 20,
-            color: '#00ff41',
-            fontName: 'Rajdhani'
+            color: '#ffffff',
+            fontName: 'Rajdhani',
+            bold: true
         },
         barLabelStyle: {
-            fontSize: 18,
-            color: '#000',
-            fontName: 'Rajdhani'
+            fontSize: 16,
+            color: '#000000',
+            fontName: 'Rajdhani',
+            bold: true
         },
-        howRowLabels: false,
-        rowLabelStyle: { fontSize: 24 },
-        barLabelStyle: { fontSize: 24 }
+        showRowLabels: true
     },
+    chartArea: {
+        left: 80,
+        right: 50,
+        top: 20,
+        bottom: 20,
+        width: 'auto',
+        height: 'auto',
+        backgroundColor: { fill: 'transparent', fillOpacity: 0 }
+    },
+    width: '100%',
+    height: '100%',
     colors: ['#00ff41', '#00c8ff', '#ffc800'],
     fontName: 'Rajdhani'
 };
@@ -41,7 +54,7 @@ const pieOption = {
     pieHole: 0.4,
     height: '100%',
     width: '100%',
-    backgroundColor: 'transparent',
+    backgroundColor: { fill: 'transparent', fillOpacity: 0 },
     colors: ['#00ff41', '#00c8ff', '#ffc800', '#ff00ff'],
     legend: {
         position: 'right',
@@ -62,7 +75,8 @@ const pieOption = {
         left: 20,
         top: 20,
         width: '90%',
-        height: '90%'
+        height: '90%',
+        backgroundColor: { fill: 'transparent', fillOpacity: 0 }
     },
     pieSliceBorderColor: '#000',
     tooltip: {
@@ -77,11 +91,39 @@ const pieOption = {
 const barOptions = {
     width: "100%",
     height: "100%",
-    legend: { position: "top" },
-    hAxis: { title: "秒", minValue: 0 },
-    vAxis: { title: "シーケンス" },
-    chartArea: { left: 80, width: "70%", height: "70%" },
-    colors: ["#0176d3", "#ffb300", "#888"],
+    backgroundColor: { fill: 'transparent', fillOpacity: 0 },
+    legend: {
+        position: "top",
+        textStyle: {
+            color: '#00ff41',
+            fontName: 'Rajdhani'
+        }
+    },
+    hAxis: {
+        title: "秒",
+        minValue: 0,
+        textStyle: {
+            color: '#00ff41',
+            fontName: 'Rajdhani'
+        },
+        titleTextStyle: {
+            color: '#00ff41',
+            fontName: 'Orbitron'
+        }
+    },
+    vAxis: {
+        title: "シーケンス",
+        textStyle: {
+            color: '#00ff41',
+            fontName: 'Rajdhani'
+        },
+        titleTextStyle: {
+            color: '#00ff41',
+            fontName: 'Orbitron'
+        }
+    },
+    chartArea: { left: 80, width: "70%", height: "70%", backgroundColor: { fill: 'transparent', fillOpacity: 0 } },
+    colors: ["#00ff41", "#00c8ff", "#ffc800"],
     isStacked: false,
 };
 let pie;
@@ -224,10 +266,12 @@ function drawChart() {
 
     pie = new google.visualization.PieChart(document.getElementById("piechart"));
     pie.draw(dataTable2, pieOption);
+
     barChart = new google.visualization.BarChart(
         document.getElementById("barchart")
     );
     barChart.draw(dataTable2, barOptions);
+
     document.getElementById("current").innerHTML = dataTable.getValue(0, 1);
 
     // timeline-infoの表示/非表示もここで念のため制御
@@ -289,6 +333,7 @@ function nextChart() {
         document.getElementById("reloadButton").disabled = false;
         document.getElementById("reloadButton").classList.remove('disabled');
         pie.draw(dataTable2, pieOption);
+
         return;
     }
     setTimeout(() => {
@@ -385,6 +430,7 @@ function start() {
     let nowDate = new Date();
     startTime = new Date();
     dataTable.setValue(0, 2, new Date(nowDate.getTime()));
+
     timeId = setInterval(updateChart, 10);
 
     timeId2 = setInterval(updateTimelineInfo, 1000);
@@ -420,6 +466,7 @@ function updateChart() {
     const split = name.split(":");
     dataTable.setValue(position, 1, `${split[0]}:${(diff / 1000).toFixed(3)}`);
     chart.draw(dataTable, timelineOptions);
+    // Don't call forceTransparentBackground here - it's too frequent and causes flickering
 }
 
 function openSettings() {
@@ -514,7 +561,7 @@ function showCompare(currentTimes) {
     let barOptions = {
         width: '100%',
         height: '100%',
-        backgroundColor: 'transparent',
+        backgroundColor: { fill: 'transparent', fillOpacity: 0 },
         legend: {
             position: 'top',
             textStyle: {
@@ -561,7 +608,7 @@ function showCompare(currentTimes) {
                 opacity: 0.2
             }
         },
-        chartArea: { left: 120, top: 50, width: '65%', height: '70%' },
+        chartArea: { left: 120, top: 50, width: '65%', height: '70%', backgroundColor: { fill: 'transparent', fillOpacity: 0 } },
         colors: ['#00ff41', '#00c8ff', '#ffc800'],
         isStacked: false,
         bar: { groupWidth: '70%' },
@@ -582,15 +629,9 @@ function changeSequenceMode() {
     const mode = document.getElementById("sequenceMode").value;
     if (mode === "morning") {
         sequences = [...morningSequence];
-        timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
-        timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
-        timelineOptions.timeline.label = "あさ";
         document.getElementById("timeline-info").style.display = "flex";
     } else {
         sequences = [...afterSequence];
-        timelineOptions.timeline.rowLabelStyle = { fontSize: 24 };
-        timelineOptions.timeline.barLabelStyle = { fontSize: 24 };
-        timelineOptions.timeline.label = "帰宅";
         document.getElementById("timeline-info").style.display = "none";
     }
     position = 0;
