@@ -42,12 +42,15 @@
             </div>
         </div>
         <footer>
-            <div style="margin-bottom: 12px; text-align: center;">
-                <label for="sequenceMode" style="font-weight:bold;">モード：</label>
-                <select id="sequenceMode" onchange="changeSequenceMode()">
-                    <option value="morning">あさ</option>
-                    <option value="after">おかえり</option>
-                </select>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="sequenceMode" style="font-weight:bold; font-size: 0.9rem;">モード：</label>
+                    <select id="sequenceMode" onchange="changeSequenceMode()" style="font-size: 0.9rem; padding: 2px 8px;">
+                        <option value="morning">あさ</option>
+                        <option value="after">おかえり</option>
+                    </select>
+                </div>
+                <button onclick="openSettings();" id="settingButton" class="save setting-button">⚙</button>
             </div>
             <div class="nav-controls">
                 <button onclick="prevChart();" id="prevButton" class="styled " disabled>前に戻る</button>
@@ -55,10 +58,6 @@
                 <button onclick="nextChart();" id="nextButton" class="styled" disabled><span id='current'></span>
                     Completed</button>
                 <button onclick="window.location.reload();" id="reloadButton" class="styled" disabled>リロード</button>
-            </div>
-            <div class="action-controls">
-                <button onclick="openSettings();" id="settingButton" class="save setting-button"><i
-                        class="fa-solid fa-gear">setting</i></button>
             </div>
         </footer>
     </article>

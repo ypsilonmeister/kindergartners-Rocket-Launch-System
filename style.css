@@ -55,18 +55,19 @@ article {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 15px;
-  gap: 15px;
+  padding: 10px;
+  gap: 8px;
   position: relative;
   z-index: 2;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 #contents {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 8px;
   min-height: 0;
   overflow: hidden;
 }
@@ -176,22 +177,17 @@ section>header {
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin: 10px 0 0 0;
-  gap: 10px;
+  margin: 0;
+  gap: 12px;
   position: static;
   flex-wrap: wrap;
 }
 
-.action-controls {
-  width: 55%;
-  align-self: center;
-}
-
 .styled {
     border: 2px solid #00ff41;
-    line-height: 2;
-    padding: 0 20px;
-    font-size: 0.9rem;
+    min-height: 44px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
     text-align: center;
     border-radius: 0;
     background: rgba(0, 0, 0, 0.8);
@@ -201,7 +197,7 @@ section>header {
     position: relative;
     overflow: hidden;
     font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     clip-path: polygon(
@@ -212,6 +208,9 @@ section>header {
         10px 100%,
         0 calc(100% - 10px)
     );
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .styled::before {
@@ -276,6 +275,42 @@ button.styled[disabled]::before {
     font-weight: 700;
 }
 
+/* Primary action buttons - make them larger and more prominent */
+#startButton,
+#nextButton {
+    min-height: 52px;
+    min-width: 140px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+    padding: 10px 24px;
+}
+
+#startButton:hover:not(:disabled),
+#nextButton:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+}
+
+#startButton:active:not(:disabled),
+#nextButton:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* Secondary buttons - still touchable but less prominent */
+#prevButton,
+#reloadButton {
+    min-height: 44px;
+    min-width: 100px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+#prevButton:hover:not(:disabled),
+#reloadButton:hover:not(:disabled) {
+    opacity: 1;
+}
+
 .save::before {
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
 }
@@ -290,20 +325,21 @@ button.styled[disabled]::before {
 #timeline-info {
     display: flex;
     align-items: center;
-    height: 70px;
+    height: 50px;
     background: rgba(0, 0, 0, 0.8);
-    padding: 15px;
+    padding: 8px 12px;
     border-radius: 0;
     border: 2px solid #00ff41;
     position: relative;
     flex-shrink: 0;
+    box-sizing: border-box;
     clip-path: polygon(
         0 0,
-        calc(100% - 15px) 0,
-        100% 15px,
+        calc(100% - 12px) 0,
+        100% 12px,
         100% 100%,
-        15px 100%,
-        0 calc(100% - 15px)
+        12px 100%,
+        0 calc(100% - 12px)
     );
 }
 
@@ -440,13 +476,13 @@ button.styled[disabled]::before {
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
 }
 
 #piechart, #barchart {
     background: rgba(0, 0, 0, 0.8) !important;
     border-radius: 0;
-    padding: 15px;
+    padding: 8px 10px;
     border: 2px solid #00ff41;
     box-shadow:
         inset 0 0 20px rgba(0, 255, 65, 0.1),
@@ -454,15 +490,16 @@ button.styled[disabled]::before {
     position: relative;
     clip-path: polygon(
         0 0,
-        calc(100% - 12px) 0,
-        100% 12px,
+        calc(100% - 10px) 0,
+        100% 10px,
         100% 100%,
-        12px 100%,
-        0 calc(100% - 12px)
+        10px 100%,
+        0 calc(100% - 10px)
     );
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 #piechart::before {
@@ -496,7 +533,7 @@ button.styled[disabled]::before {
 #timeline {
     background: rgba(0, 0, 0, 0.8);
     border-radius: 0;
-    padding: 10px 15px;
+    padding: 8px 10px;
     border: 2px solid #00ff41;
     box-shadow:
         inset 0 0 20px rgba(0, 255, 65, 0.1),
@@ -504,11 +541,11 @@ button.styled[disabled]::before {
     position: relative;
     clip-path: polygon(
         0 0,
-        calc(100% - 12px) 0,
-        100% 12px,
+        calc(100% - 10px) 0,
+        100% 10px,
         100% 100%,
-        12px 100%,
-        0 calc(100% - 12px)
+        10px 100%,
+        0 calc(100% - 10px)
     );
     flex: 1;
     min-height: 0;
@@ -583,33 +620,33 @@ label:hover {
     text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
 }
 
-/* Navigation and action controls */
-.nav-controls, .action-controls {
+/* Navigation controls */
+.nav-controls {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
 }
 
 /* Settings button with SpaceX effect */
 .setting-button {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     background: rgba(0, 0, 0, 0.9);
     border: 2px solid #00ff41;
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
     transition: all 0.3s ease;
     clip-path: polygon(
         0 0,
-        calc(100% - 8px) 0,
-        100% 8px,
+        calc(100% - 6px) 0,
+        100% 6px,
         100% 100%,
-        8px 100%,
-        0 calc(100% - 8px)
+        6px 100%,
+        0 calc(100% - 6px)
     );
     color: #00ff41;
 }
@@ -645,7 +682,7 @@ label:hover {
 /* Footer styling */
 footer {
     border-top: 2px solid #00ff41;
-    padding-top: 10px;
+    padding-top: 5px;
     flex-shrink: 0;
 }
 
