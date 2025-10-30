@@ -52,7 +52,12 @@ body::before {
 }
 
 article {
+  /* Use dvh (dynamic viewport height) for better mobile support */
+  height: 100dvh;
+  /* Fallback for browsers that don't support dvh */
   height: 100vh;
+  max-height: 100vh;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -498,9 +503,102 @@ button.styled[disabled]::before {
     );
     flex: 1 1 0;
     min-height: 0;
-    max-height: 200px;
+    max-height: 180px;
     overflow: hidden;
     box-sizing: border-box;
+}
+
+/* On small mobile screens, make charts even smaller */
+@media (max-height: 700px) {
+    article {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    #contents {
+        gap: 6px;
+    }
+
+    #piechart, #barchart {
+        max-height: 130px;
+        padding: 6px 8px;
+    }
+
+    #timeline {
+        max-height: 110px;
+        min-height: 65px;
+        padding: 6px 8px;
+    }
+
+    #timeline-info {
+        height: 42px;
+        padding: 5px 8px;
+    }
+
+    #charts {
+        gap: 6px;
+    }
+
+    .styled {
+        min-height: 40px;
+        padding: 6px 16px;
+        font-size: 0.9rem;
+    }
+
+    #startButton,
+    #nextButton {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+}
+
+/* For very small screens */
+@media (max-height: 600px) {
+    article {
+        padding: 5px;
+        gap: 4px;
+    }
+
+    #contents {
+        gap: 4px;
+    }
+
+    #piechart, #barchart {
+        max-height: 100px;
+        padding: 5px 6px;
+    }
+
+    #timeline {
+        max-height: 90px;
+        min-height: 60px;
+        padding: 5px 6px;
+    }
+
+    #timeline-info {
+        height: 38px;
+        padding: 4px 6px;
+    }
+
+    #charts {
+        gap: 4px;
+    }
+
+    .styled {
+        min-height: 36px;
+        padding: 4px 12px;
+        font-size: 0.85rem;
+    }
+
+    #startButton,
+    #nextButton {
+        min-height: 40px;
+        font-size: 0.95rem;
+        padding: 6px 18px;
+    }
+
+    footer {
+        padding-top: 3px;
+    }
 }
 
 #piechart::before {
