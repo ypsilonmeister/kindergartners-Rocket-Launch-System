@@ -1,4 +1,25 @@
-# kindergartners Rocket Launch System
-Going to Kindergarten Rocket Launch System
+# 🌅 朝のしたく タイマー
 
-An app to assist space-faring kindergartners with their morning preparations.
+小学生の朝の支度をサポートするWebアプリです。  
+時間内にすべてのタスクを終わらせることを目標に、楽しく朝の準備ができます。
+
+## 機能
+
+- ⏱️ **ビジュアルタイマー** — 残り時間が一目でわかる円形タイマー
+- 📋 **4つのタスク** — 朝ごはん → 歯みがき → 着がえ → 準備
+- 🔊 **音声サポート** — 残り時間の案内や励ましの声（Web Speech API）
+- 📊 **統計記録** — 過去の記録をグラフで表示、連続成功日数も
+- 🎨 **2つのテーマ** — 🌈かわいい / 🚀ミッション（SpaceX風）
+
+## 使い方
+
+`index.html` をブラウザで開くだけ！  
+サーバー不要、ライブラリ不使用。HTML + CSS + JS のみで動作します。
+
+## ファイル構成
+
+```
+index.html  — アプリ本体
+style.css   — スタイル（2テーマ含む）
+app.js      — ロジック（タイマー、音声、統計）
+```

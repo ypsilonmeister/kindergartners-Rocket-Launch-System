@@ -1,99 +1,140 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-    <link rel="manifest" href="manifest.json" />
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://kit.fontawesome.com/54ccae21a7.js" crossorigin="anonymous"></script>
-
-    <!-- This is a custom title. It appears above the page -->
-    <title>おしたくタイムライン</title>
-
-    <!-- The stylesheet (unchanged)  -->
-    <link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>朝のしたく タイマー</title>
+  <meta name="description" content="子どもの朝のしたくをサポートするタイマーアプリ">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1528">
 </head>
-
-<!-- Page layout  -->
-
 <body>
-    <!-- Main content  -->
-    <article>
-        <div id="contents">
-            <!-- Timeline element (unchanged)-->
-            <div id="timeline-info">
-                <span id="startTime"></span>
-                <div id="time-bar">
-                    <div id="time-indicator">
-                        <span id="currentTime"></span>
-                    </div>
-                </div>
-                <span id="goalTime"></span>
-            </div>
-            <div id="timeline"></div>
+  <div id="stars-bg" class="stars-bg"></div>
+  <!-- ===== Setup Screen ===== -->
+  <div id="setup-screen" class="screen active">
+    <div class="screen-inner">
+      <h1 class="app-title"><span class="title-emoji">🌅</span> 朝のしたく</h1>
+      <p class="app-subtitle">時間にまにあうようにがんばろう！</p>
 
-            <!--Pie chart  -->
-            <div id="charts">
-                <div id="piechart"></div>
-                <div id="barchart"></div>
-            </div>
+      <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="cute" id="theme-btn-cute">🌈 かわいい</button>
+        <button class="theme-btn" data-theme="space" id="theme-btn-space">🚀 ミッション</button>
+      </div>
+
+      <div class="setup-card">
+        <label class="setup-label" for="target-time">
+          <span class="label-emoji">🏫</span>
+          <span>家を出る時間</span>
+        </label>
+        <input type="time" id="target-time" value="07:30" class="time-input">
+      </div>
+
+      <div class="setup-card">
+        <h2 class="section-title">⏱️ やることと時間</h2>
+        <div id="task-settings-list" class="task-settings-list"></div>
+        <div class="total-time">
+          <span>全部で</span>
+          <span id="total-minutes" class="total-minutes-value">28</span>
+          <span>分</span>
         </div>
-        <footer>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="sequenceMode" style="font-weight:bold; font-size: 0.9rem;">モード：</label>
-                    <select id="sequenceMode" onchange="changeSequenceMode()" style="font-size: 0.9rem; padding: 2px 8px;">
-                        <option value="morning">あさ</option>
-                        <option value="after">おかえり</option>
-                    </select>
-                </div>
-                <button onclick="openSettings();" id="settingButton" class="save setting-button">⚙</button>
-            </div>
-            <div class="nav-controls">
-                <button onclick="prevChart();" id="prevButton" class="styled " disabled>前に戻る</button>
-                <button onclick="start();" id="startButton" class="styled">シーケンススタート</button>
-                <button onclick="nextChart();" id="nextButton" class="styled" disabled><span id='current'></span>
-                    Completed</button>
-                <button onclick="window.location.reload();" id="reloadButton" class="styled" disabled>リロード</button>
-            </div>
-        </footer>
-    </article>
+      </div>
 
-    <!-- Settings dialog. This section is completely unchanged.  -->
-    <dialog>
-        <section>
-            <header>
-                <span class="center">Settings</span><button id="close" class="modal-close">&times;</button>
-            </header>
-            <div id="settingContent">
-                <form>
-                    <input type="checkbox" name="holiday" id="holiday" />
-                    <label for="holiday">
-                        <span>休み</span>
-                    </label>
-                </form>
-                <div id="goalTimeSetting" style="margin-top:10px;">
-                    目標時刻:
-                    <input type="time" id="goalTimeInput">
-                </div>
-                <button onclick="clearHistory();" class="danger" style="margin-top:10px;">履歴クリア</button>
-            </div>
-            <footer>
-                <div class=center>
-                    <button onclick="closeSettings();" class="styled">Close</button>
-                    <button onclick="saveSettings();" class="styled save">Save</button>
-                </div>
-            </footer>
-        </section>
-    </dialog>
+      <button id="start-btn" class="btn-primary btn-start">
+        スタート！ 🚀
+      </button>
 
-    <!-- The application script  -->
-    <script src="app.js"></script>
+      <button id="stats-btn" class="btn-secondary">📊 記録を見る</button>
+    </div>
+  </div>
+
+  <!-- ===== Main Timer Screen ===== -->
+  <div id="main-screen" class="screen">
+    <div class="screen-inner main-layout">
+      <!-- Task progress dots -->
+      <div id="task-progress" class="task-progress"></div>
+
+      <!-- Current task -->
+      <div id="current-task-area" class="current-task-area">
+        <div id="task-emoji-display" class="task-emoji-display">🍚</div>
+        <div id="task-name-display" class="task-name-display">朝ごはん</div>
+      </div>
+
+      <!-- Circular Timer -->
+      <div class="timer-wrapper">
+        <svg class="timer-svg" viewBox="0 0 320 320" id="timer-svg">
+          <defs>
+            <linearGradient id="timer-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" id="grad-stop1" stop-color="#4ECDC4"/>
+              <stop offset="100%" id="grad-stop2" stop-color="#44B09E"/>
+            </linearGradient>
+            <filter id="timer-glow">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <circle class="timer-track" cx="160" cy="160" r="140"/>
+          <circle id="timer-progress-circle" class="timer-progress" cx="160" cy="160" r="140"
+                  stroke="url(#timer-gradient)" filter="url(#timer-glow)"/>
+        </svg>
+        <div class="timer-center-text">
+          <span id="timer-time" class="timer-time">00:00</span>
+          <span id="timer-label" class="timer-label">残り時間</span>
+        </div>
+      </div>
+
+      <!-- Per-task elapsed -->
+      <div class="task-elapsed-area">
+        <span class="task-elapsed-label">このタスク：</span>
+        <span id="task-elapsed-time" class="task-elapsed-time">0:00</span>
+        <span class="task-elapsed-sep"> / </span>
+        <span id="task-allocated-time" class="task-allocated-time">0:00</span>
+      </div>
+
+      <!-- Done button -->
+      <button id="done-btn" class="btn-primary btn-done">
+        できた！ ✅
+      </button>
+
+      <!-- Sound toggle -->
+      <button id="sound-toggle" class="sound-toggle" aria-label="おとの ON/OFF">🔊</button>
+    </div>
+  </div>
+
+  <!-- ===== Complete Screen ===== -->
+  <div id="complete-screen" class="screen">
+    <div class="screen-inner complete-layout">
+      <div id="confetti-box" class="confetti-box"></div>
+      <div id="result-emoji" class="result-emoji">🎉</div>
+      <h1 id="result-title" class="result-title">やったね！</h1>
+      <p id="result-message" class="result-message"></p>
+      <div id="result-summary" class="result-summary"></div>
+      <div class="complete-actions">
+        <button id="retry-btn" class="btn-primary">🔄 もう一回</button>
+        <button id="go-stats-btn" class="btn-secondary">📊 記録を見る</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Stats Screen ===== -->
+  <div id="stats-screen" class="screen">
+    <div class="screen-inner">
+      <h1 class="stats-title">📊 記録</h1>
+      <div id="streak-display" class="streak-display"></div>
+      <div id="chart-area" class="chart-area">
+        <p class="no-data-msg" id="no-data-msg">まだ記録がないよ。<br>明日からがんばろう！</p>
+      </div>
+      <div id="averages-area" class="averages-area"></div>
+      <button id="back-btn" class="btn-secondary">← もどる</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
-
-<!-- End of the HTML document.  -->
-
 </html>
