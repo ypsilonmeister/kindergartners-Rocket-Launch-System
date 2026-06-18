@@ -113,23 +113,124 @@ body {
 .task-setting-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: #f9f9f9;
   border-radius: 14px;
-  padding: 10px 14px;
+  padding: 8px 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.task-setting-row .ts-emoji { font-size: 1.5rem; flex-shrink: 0; }
-.task-setting-row .ts-name {
+
+/* 並び替えボタン */
+.ts-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.ts-reorder-btn {
+  width: 24px;
+  height: 18px;
+  border: none;
+  background: #e6e6e6;
+  color: #666;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+}
+.ts-reorder-btn:hover { background: #dcdcdc; }
+.ts-reorder-btn:active { transform: scale(0.9); }
+.ts-reorder-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* 絵文字入力 */
+.ts-emoji-input {
+  width: 32px;
+  height: 32px;
+  font-size: 1.3rem;
+  text-align: center;
+  border: 1px dashed transparent;
+  background: transparent;
+  padding: 0;
+  border-radius: 6px;
+  font-family: var(--font);
+}
+.ts-emoji-input:focus {
+  border-color: #fcb69f;
+  background: #fff;
+  outline: none;
+}
+
+/* 名前入力 */
+.ts-name-input {
   font-size: 0.95rem;
   font-weight: 700;
   flex: 1;
   min-width: 0;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-family: var(--font);
+  color: inherit;
 }
+.ts-name-input:focus {
+  border-color: #fcb69f;
+  background: #fff;
+  outline: none;
+}
+
 .task-setting-row .ts-controls {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+}
+
+/* 削除ボタン */
+.ts-delete-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  opacity: 0.5;
+  border-radius: 6px;
+  transition: opacity 0.2s, background 0.2s, transform 0.1s;
+}
+.ts-delete-btn:hover {
+  opacity: 1;
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--color-danger);
+}
+.ts-delete-btn:active {
+  transform: scale(0.9);
+}
+.ts-delete-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* 追加ボタン */
+.add-task-btn {
+  margin-top: 10px;
+  margin-bottom: 6px;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.4);
+  padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 14px;
+}
+.add-task-btn:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.25);
 }
 .ts-btn {
   width: 36px; height: 36px;
@@ -732,19 +833,54 @@ body {
 
 [data-theme="space"] .task-setting-row {
   background: rgba(5, 15, 35, 0.5);
-  border: 1px solid rgba(0,212,255,0.06);
+  border: 1px solid rgba(0, 212, 255, 0.1);
 }
-[data-theme="space"] .ts-name { color: #8ab0d0; }
-[data-theme="space"] .ts-btn {
-  background: rgba(0,212,255,0.08);
+[data-theme="space"] .ts-name-input {
+  color: #8ab0d0;
+}
+[data-theme="space"] .ts-name-input:focus,
+[data-theme="space"] .ts-emoji-input:focus {
+  border-color: rgba(0, 212, 255, 0.4);
+  background: rgba(5, 15, 35, 0.8);
   color: #00d4ff;
-  border: 1px solid rgba(0,212,255,0.2);
 }
-[data-theme="space"] .ts-btn:active { background: rgba(0,212,255,0.2); }
+[data-theme="space"] .ts-reorder-btn {
+  background: rgba(0, 212, 255, 0.08);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+[data-theme="space"] .ts-reorder-btn:hover:not(:disabled) {
+  background: rgba(0, 212, 255, 0.18);
+  border-color: #00d4ff;
+}
+[data-theme="space"] .ts-btn {
+  background: rgba(0, 212, 255, 0.08);
+  color: #00d4ff;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+[data-theme="space"] .ts-btn:active { background: rgba(0, 212, 255, 0.2); }
 [data-theme="space"] .ts-minutes {
   color: #00d4ff;
   font-family: var(--font-mono);
   font-size: 0.95rem;
+}
+[data-theme="space"] .ts-delete-btn {
+  color: #4070a0;
+}
+[data-theme="space"] .ts-delete-btn:hover:not(:disabled) {
+  background: rgba(255, 51, 102, 0.15);
+  color: #ff3366;
+}
+[data-theme="space"] .add-task-btn {
+  border: 1px dashed rgba(0, 212, 255, 0.3);
+  background: rgba(10, 25, 50, 0.4);
+  color: #00d4ff;
+  font-family: var(--font-mono);
+}
+[data-theme="space"] .add-task-btn:hover {
+  background: rgba(0, 212, 255, 0.08);
+  border-color: #00d4ff;
+  box-shadow: 0 0 12px rgba(0, 212, 255, 0.1);
 }
 [data-theme="space"] .total-time { color: #4070a0; }
 [data-theme="space"] .total-minutes-value { color: #00d4ff; font-family: var(--font-mono); }

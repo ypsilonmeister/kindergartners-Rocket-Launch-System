@@ -61,26 +61,39 @@ function init() {
 // ===== Settings persistence =====
 function loadSettings() {
   try {
-    const saved = localStorage.getItem('asa_settings');
+    const saved = localStorage.getItem('asa_settings_v2');
     if (saved) {
       const s = JSON.parse(saved);
       state.targetTime = s.targetTime || '07:30';
-      if (s.taskMinutes) {
-        state.tasks.forEach((t, i) => {
-          if (s.taskMinutes[t.id] != null) t.minutes = s.taskMinutes[t.id];
-        });
+      if (s.tasks) {
+        state.tasks = s.tasks;
+      }
+    } else {
+      // 旧バージョンからの移行
+      const oldSaved = localStorage.getItem('asa_settings');
+      if (oldSaved) {
+        const s = JSON.parse(oldSaved);
+        state.targetTime = s.targetTime || '07:30';
+        if (s.taskMinutes) {
+          state.tasks = TASKS.map(t => ({
+            ...t,
+            minutes: s.taskMinutes[t.id] != null ? s.taskMinutes[t.id] : t.defaultMin
+          }));
+        }
+      } else {
+        state.tasks = TASKS.map(t => ({ ...t, minutes: t.defaultMin }));
       }
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    state.tasks = TASKS.map(t => ({ ...t, minutes: t.defaultMin }));
+  }
   $('#target-time').value = state.targetTime;
 }
 
 function saveSettings() {
-  const taskMinutes = {};
-  state.tasks.forEach(t => taskMinutes[t.id] = t.minutes);
-  localStorage.setItem('asa_settings', JSON.stringify({
+  localStorage.setItem('asa_settings_v2', JSON.stringify({
     targetTime: state.targetTime,
-    taskMinutes,
+    tasks: state.tasks,
   }));
 }
 
@@ -91,14 +104,25 @@ function renderTaskSettings() {
   state.tasks.forEach((task, i) => {
     const row = document.createElement('div');
     row.className = 'task-setting-row';
+    row.setAttribute('data-idx', i);
+
+    const isFirst = i === 0;
+    const isLast = i === state.tasks.length - 1;
+    const canDelete = state.tasks.length > 1;
+
     row.innerHTML = `
-      <span class="ts-emoji">${task.emoji}</span>
-      <span class="ts-name">${task.name}</span>
-      <div class="ts-controls">
-        <button class="ts-btn" data-idx="${i}" data-dir="-1" aria-label="へらす">−</button>
-        <span class="ts-minutes" id="ts-min-${i}">${task.minutes}分</span>
-        <button class="ts-btn" data-idx="${i}" data-dir="1" aria-label="ふやす">＋</button>
+      <div class="ts-reorder">
+        <button class="ts-reorder-btn ts-up" data-idx="${i}" ${isFirst ? 'disabled' : ''} aria-label="上へ">▲</button>
+        <button class="ts-reorder-btn ts-down" data-idx="${i}" ${isLast ? 'disabled' : ''} aria-label="下へ">▼</button>
       </div>
+      <input type="text" class="ts-emoji-input" value="${task.emoji}" data-idx="${i}" maxlength="2" title="絵文字">
+      <input type="text" class="ts-name-input" value="${task.name}" data-idx="${i}" placeholder="したくの名前">
+      <div class="ts-controls">
+        <button class="ts-btn ts-min-btn" data-idx="${i}" data-dir="-1" aria-label="へらす">−</button>
+        <span class="ts-minutes" id="ts-min-${i}">${task.minutes}分</span>
+        <button class="ts-btn ts-min-btn" data-idx="${i}" data-dir="1" aria-label="ふやす">＋</button>
+      </div>
+      <button class="ts-delete-btn" data-idx="${i}" ${canDelete ? '' : 'disabled'} aria-label="削除">🗑️</button>
     `;
     list.appendChild(row);
   });
@@ -117,20 +141,92 @@ function showScreen(id) {
 
 // ===== Bind events =====
 function bindEvents() {
-  // Task duration +/- buttons
+  // Task settings list event delegation (buttons)
   $('#task-settings-list').addEventListener('click', (e) => {
-    const btn = e.target.closest('.ts-btn');
-    if (!btn) return;
-    const idx = parseInt(btn.dataset.idx);
-    const dir = parseInt(btn.dataset.dir);
-    state.tasks[idx].minutes = Math.max(1, state.tasks[idx].minutes + dir);
-    $(`#ts-min-${idx}`).textContent = state.tasks[idx].minutes + '分';
-    updateTotalMinutes();
+    // 時間調整ボタン
+    const minBtn = e.target.closest('.ts-min-btn');
+    if (minBtn) {
+      const idx = parseInt(minBtn.dataset.idx);
+      const dir = parseInt(minBtn.dataset.dir);
+      state.tasks[idx].minutes = Math.max(1, state.tasks[idx].minutes + dir);
+      $(`#ts-min-${idx}`).textContent = state.tasks[idx].minutes + '分';
+      updateTotalMinutes();
+      saveSettings();
+      return;
+    }
+
+    // 上へボタン
+    const upBtn = e.target.closest('.ts-up');
+    if (upBtn) {
+      const idx = parseInt(upBtn.dataset.idx);
+      if (idx > 0) {
+        const temp = state.tasks[idx];
+        state.tasks[idx] = state.tasks[idx - 1];
+        state.tasks[idx - 1] = temp;
+        renderTaskSettings();
+        updateTotalMinutes();
+        saveSettings();
+      }
+      return;
+    }
+
+    // 下へボタン
+    const downBtn = e.target.closest('.ts-down');
+    if (downBtn) {
+      const idx = parseInt(downBtn.dataset.idx);
+      if (idx < state.tasks.length - 1) {
+        const temp = state.tasks[idx];
+        state.tasks[idx] = state.tasks[idx + 1];
+        state.tasks[idx + 1] = temp;
+        renderTaskSettings();
+        updateTotalMinutes();
+        saveSettings();
+      }
+      return;
+    }
+
+    // 削除ボタン
+    const deleteBtn = e.target.closest('.ts-delete-btn');
+    if (deleteBtn) {
+      const idx = parseInt(deleteBtn.dataset.idx);
+      if (state.tasks.length > 1) {
+        state.tasks.splice(idx, 1);
+        renderTaskSettings();
+        updateTotalMinutes();
+        saveSettings();
+      }
+      return;
+    }
+  });
+
+  // Task input fields change (save automatically)
+  $('#task-settings-list').addEventListener('change', (e) => {
+    const emojiInput = e.target.closest('.ts-emoji-input');
+    if (emojiInput) {
+      const idx = parseInt(emojiInput.dataset.idx);
+      state.tasks[idx].emoji = emojiInput.value || '✨';
+      saveSettings();
+      return;
+    }
+
+    const nameInput = e.target.closest('.ts-name-input');
+    if (nameInput) {
+      const idx = parseInt(nameInput.dataset.idx);
+      state.tasks[idx].name = nameInput.value || 'したく';
+      saveSettings();
+      return;
+    }
+  });
+
+  // 「やることを追加」ボタン
+  $('#add-task-btn').addEventListener('click', () => {
+    addNewTask();
   });
 
   // Target time change
   $('#target-time').addEventListener('change', (e) => {
     state.targetTime = e.target.value;
+    saveSettings();
   });
 
   // Start button
@@ -160,6 +256,24 @@ function bindEvents() {
   // Theme toggle
   $('#theme-btn-cute').addEventListener('click', () => setTheme('cute'));
   $('#theme-btn-space').addEventListener('click', () => setTheme('space'));
+}
+
+// ===== Add new task =====
+const PALETTE = ['#FF9A76', '#6BCB77', '#9B59B6', '#3498DB', '#F1C40F', '#E74C3C', '#1ABC9C', '#FD79A8'];
+
+function addNewTask() {
+  const color = PALETTE[state.tasks.length % PALETTE.length];
+  const newTask = {
+    id: 'task_' + Date.now(),
+    name: '新しいしたく',
+    emoji: '✨',
+    color: color,
+    minutes: 5
+  };
+  state.tasks.push(newTask);
+  renderTaskSettings();
+  updateTotalMinutes();
+  saveSettings();
 }
 
 // ===== Start routine =====
@@ -525,7 +639,7 @@ function renderStats() {
 
   // === Averages ===
   const avgByTask = {};
-  TASKS.forEach(t => avgByTask[t.id] = { sum: 0, count: 0, emoji: t.emoji, name: t.name, color: t.color });
+  state.tasks.forEach(t => avgByTask[t.id] = { sum: 0, count: 0, emoji: t.emoji, name: t.name, color: t.color });
   hist.forEach(h => {
     (h.tasks || []).forEach(tr => {
       if (avgByTask[tr.id]) {
